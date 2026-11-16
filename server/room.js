@@ -147,6 +147,7 @@ export class Room {
 
   say(seat, text, name = null, kind = 'event', fx = undefined) {
     const entry = { seat, name, text, kind, at: Date.now() };
+    if (fx?.alert) entry.alert = true; // shouted in the log
     this.log.push(entry);
     if (this.log.length > LOG_SIZE) this.log.shift();
     // Effects are played once, live; they are not part of the stored history.

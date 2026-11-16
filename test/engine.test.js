@@ -216,10 +216,10 @@ test('un jeu qui évolue : cartes marquées et ajoutées survivent à la partie 
   assert.ok(applyAction(state, 0, { type: 'mark', cards: [card.id], note: 'x' }).error, 'face cachée : refusé');
   applyAction(state, 0, { type: 'flip', cards: [card.id], faceUp: true });
   assert.ok(applyAction(state, 0, { type: 'mark', cards: [card.id], note: 'Atout de mamie' }).ok);
-  assert.ok(applyAction(state, 0, { type: 'mark', cards: [card.id], sticker: '⭐' }).ok);
+  assert.ok(applyAction(state, 0, { type: 'mark', cards: [card.id], sticker: 'etoile' }).ok);
   assert.ok(applyAction(state, 0, { type: 'mark', cards: [card.id], torn: true }).ok);
   assert.ok(applyAction(state, 0, { type: 'mark', cards: [card.id], sticker: '<b>' }).error);
-  assert.deepEqual(viewFor(state, 1).legacy.marks[card.proto], { note: 'Atout de mamie', torn: true, stickers: ['⭐'] });
+  assert.deepEqual(viewFor(state, 1).legacy.marks[card.proto], { note: 'Atout de mamie', torn: true, stickers: ['etoile'] });
   const to = state.def.zones.find((z) => z.owner === 'table').id;
   assert.ok(applyAction(state, 1, { type: 'addCard', deck: Object.keys(state.def.decks)[0], to, card: { name: 'Le Fou', text: 'Bat tout.', image: 'https://x/y.png', fixed: true } }).ok);
   assert.ok(applyAction(state, 1, { type: 'addCard', deck: 'nope', to, card: { name: 'x' } }).error);

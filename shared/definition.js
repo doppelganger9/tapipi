@@ -115,7 +115,7 @@ export function normalizeMarks(raw, where = 'marks') {
   if (note) marks.note = note;
   if (raw.scribble === true) marks.scribble = true;
   if (raw.torn === true) marks.torn = true;
-  const stickers = list(raw.stickers, 6, `${where}.stickers`).map((s, i) => text(s, 8, `${where}.stickers[${i}]`).trim()).filter(Boolean);
+  const stickers = list(raw.stickers, 6, `${where}.stickers`).map((s, i) => text(s, 12, `${where}.stickers[${i}]`).trim()).filter(Boolean);
   if (stickers.length) marks.stickers = stickers;
   return Object.keys(marks).length ? marks : null;
 }
@@ -141,7 +141,7 @@ function standardCards(preset, jokers) {
       cards.push({ id: rank + letter, name: `${rankName} de ${suitName}`, rank, suit: symbol, color });
     }
   }
-  if (jokers) cards.push({ id: 'JOKER', name: 'Joker', type: 'Joker', art: '★', count: jokers });
+  if (jokers) cards.push({ id: 'JOKER', name: 'Joker', type: 'Joker', art: ':etoile', count: jokers });
   return cards;
 }
 

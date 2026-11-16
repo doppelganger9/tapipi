@@ -7,38 +7,67 @@
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="rough"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="5"/></filter></svg>
   <main id="lobby">
-    <header class="hero">
-      <h1>Tapipi</h1>
-      <p>Une table, des cartes, vos règles. Envoyez un lien, tout le monde s'assoit — sans compte ni installation.</p>
-    </header>
+    <div class="cover">
+      <header class="hero">
+        <div class="masthead"><span>Table de jeu en ligne</span><span>N° 001 — sans compte ni installation</span></div>
+        <h1>Tapipi</h1>
+        <p class="pitch">Une table. Des cartes. Vos règles. Envoyez un lien, tout le monde s'assoit.</p>
+        <div class="ring" style="right: 6%; bottom: -34px; width: 210px; height: 204px; rotate: -18deg" aria-hidden="true"></div>
+        <div class="ring faint" style="right: calc(6% + 96px); bottom: 58px; width: 196px; height: 200px; rotate: 40deg" aria-hidden="true"></div>
+        <div class="drop" style="right: calc(6% + 250px); bottom: 26px; width: 18px; height: 15px" aria-hidden="true"></div>
+        <div class="drop" style="right: calc(6% + 282px); bottom: 52px; width: 8px; height: 8px" aria-hidden="true"></div>
+        <div class="price" aria-hidden="true"><b>0 €</b><span>Le numéro</span></div>
+      </header>
 
-    <section id="invite" class="panel invite" hidden>
-      <p class="kicker">Vous êtes invité·e</p>
-      <h2 id="inviteTitle"></h2>
-      <p id="inviteGame" class="muted"></p>
-    </section>
+      <aside class="entry">
+        <div class="tape" aria-hidden="true"></div>
+        <p class="kicker">Fiche d'entrée</p>
+        <section id="invite" class="invite" hidden>
+          <p class="kicker">Vous êtes invité·e</p>
+          <h2 id="inviteTitle"></h2>
+          <p id="inviteGame" class="muted"></p>
+        </section>
+        <section class="identity">
+          <label for="name">Votre nom autour de la table</label>
+          <input id="name" maxlength="20" autocomplete="nickname">
+          <button id="reroll" type="button">Tirer un autre surnom</button>
+          <button id="sitBtn" class="big" hidden>S'asseoir à la table</button>
+        </section>
+        <div id="codeBox" class="codebox">
+          <label for="code">J'ai reçu un code de table</label>
+          <form id="joinForm" class="inline">
+            <input id="code" maxlength="5" placeholder="CODE" autocapitalize="characters">
+            <button>Rejoindre</button>
+          </form>
+        </div>
+      </aside>
+    </div>
 
-    <section class="panel identity">
-      <label for="name">Votre nom autour de la table</label>
-      <div class="inline">
-        <input id="name" maxlength="20" autocomplete="nickname">
-        <button id="reroll" type="button" title="Tirer un autre surnom" aria-label="Tirer un autre surnom">🎲</button>
+    <div class="strip" aria-hidden="true"><span>Sans compte</span><span>/</span><span>Sans installation</span><span>/</span><span>Sans publicité</span><span>/</span><span>Rien n'est stocké</span><span>/</span><span>Jusqu'à 8 joueurs</span></div>
+
+    <section id="create">
+      <div class="watermark" aria-hidden="true">Spécimen</div>
+      <div class="ring" aria-hidden="true"></div>
+      <div class="create-head">
+        <h2>Ouvrir une table</h2>
+        <p>Choisissez une ligne. La table s'ouvre aussitôt et vous recevez un lien à envoyer.</p>
       </div>
-      <button id="sitBtn" class="primary big" hidden>S'asseoir à la table</button>
+      <div id="picker" class="picker"></div>
     </section>
 
-    <section id="create" class="panel">
-      <h2>Ouvrir une table</h2>
-      <p class="muted">Choisissez un jeu : la table s'ouvre aussitôt et vous recevez un lien à envoyer.</p>
-      <div id="picker" class="picker"></div>
-      <details class="code">
-        <summary>J'ai reçu un code de table</summary>
-        <form id="joinForm" class="inline">
-          <input id="code" maxlength="5" placeholder="CODE" aria-label="Code de la table" autocapitalize="characters">
-          <button>Rejoindre</button>
-        </form>
-      </details>
+    <section class="manifesto">
+      <div class="ghost" aria-hidden="true">N°1</div>
+      <div class="ring" aria-hidden="true"></div>
+      <p class="kicker">Ce qu'on ne fait qu'autour d'une vraie table</p>
+      <div class="shout">
+        <div>Renverser la table.</div>
+        <div>Lorgner le jeu du voisin.</div>
+        <div>Déchirer une carte.</div>
+        <div>Déballer la boîte.</div>
+      </div>
+      <p class="after">Tapipi ne connaît aucune règle. Il simule la table, les cartes, les pions — et les mauvais joueurs. Le reste, c'est entre vous.</p>
     </section>
 
     <footer class="fine">
@@ -55,7 +84,7 @@
       <button id="share" class="primary" title="Inviter d'autres joueurs">Inviter</button>
       <span id="status" class="status" hidden>Reconnexion…</span>
       <span class="spacer"></span>
-      <label class="felt" title="Couleur de votre tapis">Tapis <input type="color" id="felt"></label>
+      <label class="felt" title="Le papier de votre tapis">Tapis <select id="felt"></select></label>
       <button id="helpBtn" title="Revoir le tutoriel">Aide</button>
       <button id="rulesBtn">Règles</button>
       <button id="restartBtn" class="host-only">Nouvelle partie</button>
@@ -130,7 +159,7 @@
       <p class="muted">Elle rejoint le jeu pour de bon : elle sera encore là à la prochaine partie.</p>
       <label>Nom <input name="name" maxlength="60" required autocomplete="off"></label>
       <label>Type <input name="type" maxlength="40" autocomplete="off"></label>
-      <label>Symbole (un émoji) <input name="art" maxlength="16" autocomplete="off"></label>
+      <label>Symbole (un pictogramme de la liste, ou un mot court) <input name="art" maxlength="16" autocomplete="off" list="glyphList" placeholder=":etoile"></label>
       <label>Texte <textarea name="text" maxlength="600" rows="3"></textarea></label>
       <label>Dans quel paquet <select name="deck"></select></label>
       <label>Où la poser <select name="to"></select></label>

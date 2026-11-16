@@ -10,7 +10,7 @@
     "min": 2,
     "max": 8
   },
-  "rules": "1. Quelqu'un présente la tâche à estimer.\n2. Chacun choisit une carte dans sa main et la pose (double-clic) : elle arrive face cachée dans sa zone « Vote ».\n3. Quand tout le monde a voté, lancez l'action de table « Révéler les votes ».\n4. Les extrêmes s'expliquent, on discute, puis « Nouveau vote ».\n\n? = je ne sais pas · ☕ = j'ai besoin d'une pause.",
+  "rules": "1. Quelqu'un présente la tâche à estimer.\n2. Chacun choisit une carte dans sa main et la pose (double-clic) : elle arrive face cachée dans sa zone « Vote ».\n3. Quand tout le monde a voté, lancez l'action de table « Révéler les votes ».\n4. Les extrêmes s'expliquent, on discute, puis « Nouveau vote ».\n\n? = je ne sais pas · :tasse = j'ai besoin d'une pause.",
   "table": {
     "color": "#22384f"
   },
@@ -90,7 +90,7 @@
         {
           "id": "pause",
           "name": "Pause",
-          "art": "☕",
+          "art": ":tasse",
           "color": "#6b4a2f"
         }
       ]

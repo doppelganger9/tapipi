@@ -16,11 +16,11 @@ const boardDeck = [
 ];
 const cards = [
   ...pawns.map(([name, color]) => ({ id: `pion-${name.toLowerCase()}`, name: `Pion ${name.toLowerCase()}`, shape: 'round', size: 0.5, color, count: 8 })),
-  { id: 'tuile-foret', name: 'Tuile forêt', shape: 'square', size: 0.74, color: '#2e6b3f', art: '🌲', count: 6 },
-  { id: 'tuile-eau', name: 'Tuile eau', shape: 'square', size: 0.74, color: '#2a6f97', art: '🌊', count: 6 },
-  { id: 'mini', name: 'Mini-carte', type: 'Ressource', size: 0.6, color: '#7a5c9c', art: '💎', count: 6 },
-  { id: 'evenement', name: 'Événement', type: 'Carte', color: '#b8322a', art: '⚡', text: 'Une carte de taille standard.', count: 4 },
-  { id: 'aide', name: 'Aide de jeu', type: 'Grande carte', size: 1.6, ratio: 0.7, color: '#4a5562', art: '📜', text: 'Une grande carte, au format paysage.', count: 1 },
+  { id: 'tuile-foret', name: 'Tuile forêt', shape: 'square', size: 0.74, color: '#2e6b3f', art: ':sapin', count: 6 },
+  { id: 'tuile-eau', name: 'Tuile eau', shape: 'square', size: 0.74, color: '#2a6f97', art: ':vague', count: 6 },
+  { id: 'mini', name: 'Mini-carte', type: 'Ressource', size: 0.6, color: '#7a5c9c', art: ':diamant', count: 6 },
+  { id: 'evenement', name: 'Événement', type: 'Carte', color: '#b8322a', art: ':eclair', text: 'Une carte de taille standard.', count: 4 },
+  { id: 'aide', name: 'Aide de jeu', type: 'Grande carte', size: 1.6, ratio: 0.7, color: '#4a5562', art: ':parchemin', text: 'Une grande carte, au format paysage.', count: 1 },
 ];
 
 const def = {

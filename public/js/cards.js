@@ -2,6 +2,7 @@
 // file's data — the platform ships no artwork of its own.
 
 import { h, fill } from './dom.js';
+import { artGlyph, glyphEl } from './glyphs.js';
 
 const COLOR = /^#[0-9a-fA-F]{3,8}$/;
 const IMAGE = /^(https:\/\/|data:image\/(png|jpeg|webp|gif|svg\+xml);base64,)/;
@@ -9,7 +10,8 @@ const IMAGE = /^(https:\/\/|data:image\/(png|jpeg|webp|gif|svg\+xml);base64,)/;
 function artEl(proto) {
   if (proto.image && IMAGE.test(proto.image)) return h('img', { class: 'art', src: proto.image, alt: '', draggable: false, referrerPolicy: 'no-referrer' });
   const art = proto.art ?? '';
-  return h('div', { class: `art ${[...art].length > 2 ? 'long' : ''}` }, art);
+  const glyph = artGlyph(art);
+  return h('div', { class: `art ${!glyph && [...art].length > 2 ? 'long' : ''}` }, glyph ?? art);
 }
 
 function faceEl(proto, detailed) {
@@ -43,7 +45,7 @@ function marksEl(marks) {
   const layer = h('div', { class: `marks ${marks.torn ? 'torn' : ''}` });
   if (marks.scribble) layer.append(h('span', { class: 'scribble' }));
   if (marks.note) layer.append(h('span', { class: 'note' }, marks.note));
-  if (marks.stickers) layer.append(h('span', { class: 'stickers' }, marks.stickers.map((s) => h('i', {}, s))));
+  if (marks.stickers) layer.append(h('span', { class: 'stickers' }, marks.stickers.map((s) => h('i', {}, glyphEl(s) ?? s))));
   return layer;
 }
 

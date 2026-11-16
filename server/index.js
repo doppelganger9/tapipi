@@ -14,7 +14,7 @@ const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const PORT = Number(process.env.PORT) || 3000;
 const MAX_ROOMS = 500;
 const ROOM_IDLE_MS = 30 * 60 * 1000;
-const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml' };
+const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.txt': 'text/plain' };
 
 // ------------------------------------------------------------------ games
 

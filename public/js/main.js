@@ -3,6 +3,7 @@
 
 import { $, h, fill, SEAT_COLORS } from './dom.js';
 import { cardEl } from './cards.js';
+import { glyphEl, GLYPHS } from './glyphs.js';
 import { createConnection } from './net.js';
 import { createTable } from './table.js';
 import { createCoach, randomNickname } from './onboarding.js';
@@ -173,6 +174,7 @@ function showLobby(invitation) {
   $('invite').hidden = !invitation;
   $('sitBtn').hidden = !invitation;
   $('create').hidden = Boolean(invitation);
+  $('codeBox').hidden = Boolean(invitation);
   if (!invitation) return;
   const names = invitation.players;
   $('inviteTitle').textContent = !names.length ? 'Une table vous attend'
@@ -187,6 +189,7 @@ function join(code) {
 }
 
 $('name').value = store.get('tapis:name') ?? randomNickname();
+$('reroll').prepend(glyphEl('de'));
 $('reroll').addEventListener('click', () => { $('name').value = randomNickname(); });
 $('name').addEventListener('keydown', (event) => { if (event.key === 'Enter' && !$('sitBtn').hidden) $('sitBtn').click(); });
 $('sitBtn').addEventListener('click', () => join(location.hash.slice(1)));
@@ -262,12 +265,24 @@ $('quitBtn').addEventListener('click', () => { sessionStorage.removeItem('tapis:
 
 /** The felt colour: the player's own choice wins over the game's suggestion. */
 function applyFelt() {
-  const color = store.get('tapis:felt') ?? S.def?.table?.color ?? '#1f5c4a';
-  $('felt').value = color;
-  $('table').style.setProperty('--felt', color);
-  $('table').style.backgroundImage = S.def?.table?.image ? `url("${S.def.table.image}")` : '';
+  const light = (hex) => { // a game may suggest a colour, as long as black ink stays readable on it
+    const m = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i.exec(hex ?? '');
+    return m && (0.299 * parseInt(m[1], 16) + 0.587 * parseInt(m[2], 16) + 0.114 * parseInt(m[3], 16)) > 150;
+  };
+  const stock = Object.hasOwn(PAPERS, store.get('tapis:felt')) ? store.get('tapis:felt') : '';
+  $('felt').value = stock;
+  const suggested = S.def?.table?.color;
+  $('table').style.setProperty('--felt', stock ? PAPERS[stock] : light(suggested) ? suggested : PAPERS.papier);
+  const image = S.def?.table?.image;
+  $('table').style.backgroundImage = image ? `url("${image}")` : '';
+  $('table').style.backgroundSize = image ? 'cover' : '';
 }
-$('felt').addEventListener('input', (event) => { store.set('tapis:felt', event.target.value); applyFelt(); });
+/** The table is a sheet of paper: one picks its stock, not a felt colour. */
+const PAPERS = { papier: '#f1ecdf', kraft: '#d9b98a', journal: '#e3dcc0', buvard: '#f4c9c2', billard: '#bfdcc0', ciel: '#c4dceb', carton: '#cfcbc2', poussin: '#f7ee8a' };
+fill($('felt'), h('option', { value: '' }, 'du jeu'), Object.keys(PAPERS).map((name) => h('option', { value: name }, name)));
+$('felt').addEventListener('change', (event) => { store.set('tapis:felt', event.target.value); applyFelt(); });
+// Pictogram names offered wherever a card's symbol is typed.
+document.body.append(h('datalist', { id: 'glyphList' }, Object.keys(GLYPHS).map((name) => h('option', { value: `:${name}` }))));
 
 // ------------------------------------------------------------------ sidebar
 
@@ -289,9 +304,9 @@ function renderSidebar() {
 
   fill($('players'),
     S.players.map((p) => h('div', { class: `player ${p.connected ? '' : 'away'} ${S.view.turn === p.seat ? 'turn' : ''}`, style: `--seat:${SEAT_COLORS[p.seat]}` },
-      h('span', { class: 'who' }, h('i', { class: 'dot' }), p.name, p.seat === S.you && ' (vous)', p.seat === S.host && h('span', { title: 'Hôte de la table' }, ' ♛')),
+      h('span', { class: 'who' }, h('i', { class: 'dot' }), p.name, p.seat === S.you && ' (vous)', p.seat === S.host && h('small', { title: 'Hôte de la table' }, 'hôte')),
       perPlayer.map((c) => counterEl(c, p.seat)),
-      playing && p.seat !== S.you && h('button', { class: 'throw', title: `Lancer quelque chose sur ${p.name}`, onclick: () => act({ type: 'throw', seat: p.seat }) }, '🍅'))),
+      playing && p.seat !== S.you && h('button', { class: 'throw', title: `Lancer quelque chose sur ${p.name}`, 'aria-label': `Lancer quelque chose sur ${p.name}`, onclick: () => act({ type: 'throw', seat: p.seat }) }, glyphEl('tomate')))),
     shared.length && h('div', { class: 'player' }, shared.map((c) => counterEl(c, null))),
     S.players.length < 2 && h('button', { class: 'lonely', onclick: () => openWelcome(false) }, 'Vous êtes seul·e à table — inviter des joueurs'),
   );
@@ -310,7 +325,7 @@ function renderSidebar() {
     h('div', { class: 'group' }, h('span', { class: 'label' }, 'Le jeu évolue'),
       h('button', { title: 'Écrire une carte qui restera dans le jeu', onclick: openAddCard }, 'Ajouter une carte…'),
       h('button', { title: 'Télécharger le jeu tel qu’il est devenu (cartes marquées et ajoutées), pour le rouvrir plus tard', onclick: () => connection.send({ t: 'save' }) }, 'Sauvegarder la boîte')),
-    h('div', { class: 'group' }, h('span', { class: 'label' }, 'Mauvais joueur'),
+    h('div', { class: 'group bad' }, h('span', { class: 'label' }, 'Mauvais joueur'),
       button('Renverser la table', { type: 'flipTable' }),
       button('Renverser son café', { type: 'spill' }),
       (S.view.stains ?? []).length > 0 && button('Éponger', { type: 'clean' })),
@@ -373,7 +388,7 @@ function openDeal(from, title, available) {
 
 function appendLog(entry) {
   const log = $('log');
-  const line = h('p', { class: entry.kind });
+  const line = h('p', { class: `${entry.kind} ${entry.alert ? 'alert' : ''}` });
   if (entry.name) line.append(h('b', { style: entry.seat >= 0 ? `color:${SEAT_COLORS[entry.seat]}` : '' }, entry.name), entry.kind === 'chat' ? ' : ' : ' ');
   line.append(entry.text);
   log.append(line);
@@ -402,7 +417,7 @@ function playEffect(fx) {
     // Everybody turns to the cheat.
     const area = document.querySelector(`.area[data-seat="${fx.from}"]`) ?? $('table');
     const rect = area.getBoundingClientRect();
-    const flag = h('div', { class: 'caught' }, '🫵 Tricheur !');
+    const flag = h('div', { class: 'caught' }, 'Tricheur !');
     flag.style.left = `${rect.left + rect.width / 2}px`;
     flag.style.top = `${rect.top + rect.height / 2}px`;
     document.body.append(flag);
@@ -416,7 +431,7 @@ function playEffect(fx) {
     };
     const [x0, y0] = center(fx.from);
     const [x1, y1] = center(fx.to);
-    const item = h('div', { class: 'projectile' }, fx.item);
+    const item = h('div', { class: 'projectile' }, glyphEl(fx.item) ?? fx.item);
     document.body.append(item);
     item.animate([
       { translate: `${x0}px ${y0}px`, rotate: '0deg', scale: 1 },

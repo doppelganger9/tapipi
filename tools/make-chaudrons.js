@@ -3,21 +3,21 @@
 import { writeFileSync } from 'node:fs';
 
 const families = [
-  { id: 'amanite', name: 'Amanite', art: '🍄', color: '#b8322a' },
-  { id: 'selenite', name: 'Sélénite', art: '🌙', color: '#4f46b8' },
-  { id: 'braise', name: 'Braise', art: '🔥', color: '#d9711c' },
-  { id: 'rosee', name: 'Rosée', art: '💧', color: '#14808a' },
+  { id: 'amanite', name: 'Amanite', art: ':champignon', color: '#b8322a' },
+  { id: 'selenite', name: 'Sélénite', art: ':lune', color: '#4f46b8' },
+  { id: 'braise', name: 'Braise', art: ':flamme', color: '#d9711c' },
+  { id: 'rosee', name: 'Rosée', art: ':goutte', color: '#14808a' },
 ];
 
 const spells = [
-  ['bourrasque', 'Bourrasque', '💨', 2, 'Chaque joueur passe une carte de sa main, face cachée, à son voisin de gauche.'],
-  ['main-leste', 'Main leste', '🤏', 2, "Prenez une carte au hasard dans la main d'un adversaire."],
-  ['secateur', 'Sécateur', '✂️', 2, "Défaussez un Chardon de n'importe quel chaudron, puis piochez une carte."],
-  ['troc', 'Troc', '🔄', 2, "Échangez un ingrédient de votre chaudron contre un ingrédient du chaudron d'un adversaire."],
-  ['double-dose', 'Double dose', '⚗️', 2, 'Jouez immédiatement deux autres cartes.'],
-  ['tisane', 'Tisane', '🍵', 2, 'Piochez deux cartes.'],
-  ['pie-voleuse', 'Pie voleuse', '🐦', 1, "Prenez l'ingrédient de votre choix dans la défausse et ajoutez-le à votre main."],
-  ['grand-menage', 'Grand ménage', '🧹', 1, 'Tous les chaudrons sont vidés dans la défausse, Chardons compris.'],
+  ['bourrasque', 'Bourrasque', ':vent', 2, 'Chaque joueur passe une carte de sa main, face cachée, à son voisin de gauche.'],
+  ['main-leste', 'Main leste', ':main', 2, "Prenez une carte au hasard dans la main d'un adversaire."],
+  ['secateur', 'Sécateur', ':ciseaux', 2, "Défaussez un Chardon de n'importe quel chaudron, puis piochez une carte."],
+  ['troc', 'Troc', ':echange', 2, "Échangez un ingrédient de votre chaudron contre un ingrédient du chaudron d'un adversaire."],
+  ['double-dose', 'Double dose', ':fiole', 2, 'Jouez immédiatement deux autres cartes.'],
+  ['tisane', 'Tisane', ':tasse', 2, 'Piochez deux cartes.'],
+  ['pie-voleuse', 'Pie voleuse', ':oiseau', 1, "Prenez l'ingrédient de votre choix dans la défausse et ajoutez-le à votre main."],
+  ['grand-menage', 'Grand ménage', ':balai', 1, 'Tous les chaudrons sont vidés dans la défausse, Chardons compris.'],
 ];
 
 const cards = [];
@@ -30,7 +30,7 @@ for (const [id, name, art, count, text] of spells) {
   cards.push({ id, name, type: 'Sortilège', art, color: '#6b3fa0', text, count });
 }
 cards.push({
-  id: 'chardon', name: 'Chardon', type: 'Nuisance', art: '🌵', color: '#4b6b2f', count: 6,
+  id: 'chardon', name: 'Chardon', type: 'Nuisance', art: ':chardon', color: '#4b6b2f', count: 6,
   text: "Posez-le dans le chaudron d'un adversaire : il occupe une place et empêche toute potion tant qu'il y reste.",
 });
 

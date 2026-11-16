@@ -84,7 +84,7 @@ des règles automatiques pour un jeu donné viendraient se brancher comme valida
       "back": { "color": "#3b2a5c", "label": "✦" },
       "preset": "standard52", "jokers": 2,              // optionnel : jeu traditionnel (ou standard32)
       "cards": [
-        { "name": "Renard", "type": "Créature", "cost": "2", "art": "🦊", "stats": "3/1",
+        { "name": "Renard", "type": "Créature", "cost": "2", "art": ":oiseau", "stats": "3/1",
           "text": "Effet de la carte.", "color": "#b8322a", "count": 3 },
         { "name": "Pion", "shape": "round", "size": 0.5, "color": "#14808a", "count": 8 },
         { "name": "Tuile", "shape": "square", "image": "data:image/jpeg;base64,…" }
@@ -133,7 +133,13 @@ Chardons » sous CC BY 4.0.
 
 ## Tricher, et faire vivre le jeu
 
-- **Lorgner** : le bouton 👀 sur la main d'un autre joueur montre une carte de plus à chaque essai, à vous seul — ou vous fait prendre devant toute la table (25 % au premier essai, +15 % par carte déjà vue). `"cheating": false` dans le fichier de jeu l'interdit.
+- **Lorgner** : le bouton « Lorgner » sur la main d'un autre joueur montre une carte de plus à chaque essai, à vous seul — ou vous fait prendre devant toute la table (25 % au premier essai, +15 % par carte déjà vue). `"cheating": false` dans le fichier de jeu l'interdit.
 - **Marquer** : une carte face visible peut recevoir un mot, un gribouillis, une déchirure, des autocollants (menu « Marquer… » de la sélection). La marque appartient à la carte : elle revient aux parties suivantes.
 - **Ajouter une carte** : « Ajouter une carte… » écrit une nouvelle carte (texte et émoji) qui rejoint le paquet pour de bon.
 - **Sauvegarder la boîte** : télécharge le jeu tel qu'il est devenu, au format `tapis/1` ; on le rouvre avec « Charger un fichier de jeu ». Rien n'est stocké sur le serveur.
+
+## Pictogrammes
+
+Tapipi n'utilise aucun emoji. Le champ `art` d'une carte accepte un mot court, un chiffre, ou le nom d'un pictogramme maison précédé de deux-points : `":flamme"`, `":crane"`, `":de"`… La liste complète est dans `public/js/glyphs.js` ; l'éditeur et la boîte « Ajouter une carte » la proposent à la saisie.
+
+Les polices (Anton, Archivo, JetBrains Mono, licence OFL) sont servies depuis `public/fonts/` : aucun appel à un service tiers.

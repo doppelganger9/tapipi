@@ -6,9 +6,11 @@
 
 import { $, h, fill } from './dom.js';
 import { cardEl } from './cards.js';
+import { GLYPHS } from './glyphs.js';
 import { normalizeDefinition } from '/shared/definition.js';
 
 const DRAFT_KEY = 'tapis:draft';
+document.body.append(h('datalist', { id: 'glyphList' }, Object.keys(GLYPHS).map((name) => h('option', { value: `:${name}` }))));
 const TEMPLATE = '/games/01-chaudrons-et-chardons.json';
 
 let game = null; // raw definition
@@ -28,7 +30,7 @@ function toast(text) {
 function blankGame() {
   return {
     format: 'tapis/1', id: 'mon-jeu', name: 'Mon jeu', description: '', players: { min: 2, max: 4 }, rules: '',
-    decks: { cartes: { back: { color: '#3b2a5c', label: '✦' }, cards: [{ name: 'Première carte', type: 'Créature', cost: '1', art: '🦊', color: '#b8322a', text: 'Décrivez ici son effet.' }] } },
+    decks: { cartes: { back: { color: '#3b2a5c', label: '✦' }, cards: [{ name: 'Première carte', type: 'Créature', cost: '1', art: ':oiseau', color: '#b8322a', text: 'Décrivez ici son effet.' }] } },
     zones: [
       { id: 'pioche', name: 'Pioche', visibility: 'hidden', layout: 'stack' },
       { id: 'defausse', name: 'Défausse', visibility: 'public', layout: 'stack' },

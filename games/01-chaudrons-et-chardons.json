@@ -30,7 +30,7 @@
           "name": "Amanite 1",
           "type": "Ingrédient · Amanite",
           "cost": "1",
-          "art": "🍄",
+          "art": ":champignon",
           "color": "#b8322a"
         },
         {
@@ -38,7 +38,7 @@
           "name": "Amanite 2",
           "type": "Ingrédient · Amanite",
           "cost": "2",
-          "art": "🍄",
+          "art": ":champignon",
           "color": "#b8322a"
         },
         {
@@ -46,7 +46,7 @@
           "name": "Amanite 3",
           "type": "Ingrédient · Amanite",
           "cost": "3",
-          "art": "🍄",
+          "art": ":champignon",
           "color": "#b8322a"
         },
         {
@@ -54,7 +54,7 @@
           "name": "Amanite 4",
           "type": "Ingrédient · Amanite",
           "cost": "4",
-          "art": "🍄",
+          "art": ":champignon",
           "color": "#b8322a"
         },
         {
@@ -62,7 +62,7 @@
           "name": "Amanite 5",
           "type": "Ingrédient · Amanite",
           "cost": "5",
-          "art": "🍄",
+          "art": ":champignon",
           "color": "#b8322a"
         },
         {
@@ -70,7 +70,7 @@
           "name": "Amanite 6",
           "type": "Ingrédient · Amanite",
           "cost": "6",
-          "art": "🍄",
+          "art": ":champignon",
           "color": "#b8322a"
         },
         {
@@ -78,7 +78,7 @@
           "name": "Amanite 7",
           "type": "Ingrédient · Amanite",
           "cost": "7",
-          "art": "🍄",
+          "art": ":champignon",
           "color": "#b8322a"
         },
         {
@@ -86,7 +86,7 @@
           "name": "Amanite 8",
           "type": "Ingrédient · Amanite",
           "cost": "8",
-          "art": "🍄",
+          "art": ":champignon",
           "color": "#b8322a"
         },
         {
@@ -94,7 +94,7 @@
           "name": "Amanite 9",
           "type": "Ingrédient · Amanite",
           "cost": "9",
-          "art": "🍄",
+          "art": ":champignon",
           "color": "#b8322a"
         },
         {
@@ -102,7 +102,7 @@
           "name": "Sélénite 1",
           "type": "Ingrédient · Sélénite",
           "cost": "1",
-          "art": "🌙",
+          "art": ":lune",
           "color": "#4f46b8"
         },
         {
@@ -110,7 +110,7 @@
           "name": "Sélénite 2",
           "type": "Ingrédient · Sélénite",
           "cost": "2",
-          "art": "🌙",
+          "art": ":lune",
           "color": "#4f46b8"
         },
         {
@@ -118,7 +118,7 @@
           "name": "Sélénite 3",
           "type": "Ingrédient · Sélénite",
           "cost": "3",
-          "art": "🌙",
+          "art": ":lune",
           "color": "#4f46b8"
         },
         {
@@ -126,7 +126,7 @@
           "name": "Sélénite 4",
           "type": "Ingrédient · Sélénite",
           "cost": "4",
-          "art": "🌙",
+          "art": ":lune",
           "color": "#4f46b8"
         },
         {
@@ -134,7 +134,7 @@
           "name": "Sélénite 5",
           "type": "Ingrédient · Sélénite",
           "cost": "5",
-          "art": "🌙",
+          "art": ":lune",
           "color": "#4f46b8"
         },
         {
@@ -142,7 +142,7 @@
           "name": "Sélénite 6",
           "type": "Ingrédient · Sélénite",
           "cost": "6",
-          "art": "🌙",
+          "art": ":lune",
           "color": "#4f46b8"
         },
         {
@@ -150,7 +150,7 @@
           "name": "Sélénite 7",
           "type": "Ingrédient · Sélénite",
           "cost": "7",
-          "art": "🌙",
+          "art": ":lune",
           "color": "#4f46b8"
         },
         {
@@ -158,7 +158,7 @@
           "name": "Sélénite 8",
           "type": "Ingrédient · Sélénite",
           "cost": "8",
-          "art": "🌙",
+          "art": ":lune",
           "color": "#4f46b8"
         },
         {
@@ -166,7 +166,7 @@
           "name": "Sélénite 9",
           "type": "Ingrédient · Sélénite",
           "cost": "9",
-          "art": "🌙",
+          "art": ":lune",
           "color": "#4f46b8"
         },
         {
@@ -174,7 +174,7 @@
           "name": "Braise 1",
           "type": "Ingrédient · Braise",
           "cost": "1",
-          "art": "🔥",
+          "art": ":flamme",
           "color": "#d9711c"
         },
         {
@@ -182,7 +182,7 @@
           "name": "Braise 2",
           "type": "Ingrédient · Braise",
           "cost": "2",
-          "art": "🔥",
+          "art": ":flamme",
           "color": "#d9711c"
         },
         {
@@ -190,7 +190,7 @@
           "name": "Braise 3",
           "type": "Ingrédient · Braise",
           "cost": "3",
-          "art": "🔥",
+          "art": ":flamme",
           "color": "#d9711c"
         },
         {
@@ -198,7 +198,7 @@
           "name": "Braise 4",
           "type": "Ingrédient · Braise",
           "cost": "4",
-          "art": "🔥",
+          "art": ":flamme",
           "color": "#d9711c"
         },
         {
@@ -206,7 +206,7 @@
           "name": "Braise 5",
           "type": "Ingrédient · Braise",
           "cost": "5",
-          "art": "🔥",
+          "art": ":flamme",
           "color": "#d9711c"
         },
         {
@@ -214,7 +214,7 @@
           "name": "Braise 6",
           "type": "Ingrédient · Braise",
           "cost": "6",
-          "art": "🔥",
+          "art": ":flamme",
           "color": "#d9711c"
         },
         {
@@ -222,7 +222,7 @@
           "name": "Braise 7",
           "type": "Ingrédient · Braise",
           "cost": "7",
-          "art": "🔥",
+          "art": ":flamme",
           "color": "#d9711c"
         },
         {
@@ -230,7 +230,7 @@
           "name": "Braise 8",
           "type": "Ingrédient · Braise",
           "cost": "8",
-          "art": "🔥",
+          "art": ":flamme",
           "color": "#d9711c"
         },
         {
@@ -238,7 +238,7 @@
           "name": "Braise 9",
           "type": "Ingrédient · Braise",
           "cost": "9",
-          "art": "🔥",
+          "art": ":flamme",
           "color": "#d9711c"
         },
         {
@@ -246,7 +246,7 @@
           "name": "Rosée 1",
           "type": "Ingrédient · Rosée",
           "cost": "1",
-          "art": "💧",
+          "art": ":goutte",
           "color": "#14808a"
         },
         {
@@ -254,7 +254,7 @@
           "name": "Rosée 2",
           "type": "Ingrédient · Rosée",
           "cost": "2",
-          "art": "💧",
+          "art": ":goutte",
           "color": "#14808a"
         },
         {
@@ -262,7 +262,7 @@
           "name": "Rosée 3",
           "type": "Ingrédient · Rosée",
           "cost": "3",
-          "art": "💧",
+          "art": ":goutte",
           "color": "#14808a"
         },
         {
@@ -270,7 +270,7 @@
           "name": "Rosée 4",
           "type": "Ingrédient · Rosée",
           "cost": "4",
-          "art": "💧",
+          "art": ":goutte",
           "color": "#14808a"
         },
         {
@@ -278,7 +278,7 @@
           "name": "Rosée 5",
           "type": "Ingrédient · Rosée",
           "cost": "5",
-          "art": "💧",
+          "art": ":goutte",
           "color": "#14808a"
         },
         {
@@ -286,7 +286,7 @@
           "name": "Rosée 6",
           "type": "Ingrédient · Rosée",
           "cost": "6",
-          "art": "💧",
+          "art": ":goutte",
           "color": "#14808a"
         },
         {
@@ -294,7 +294,7 @@
           "name": "Rosée 7",
           "type": "Ingrédient · Rosée",
           "cost": "7",
-          "art": "💧",
+          "art": ":goutte",
           "color": "#14808a"
         },
         {
@@ -302,7 +302,7 @@
           "name": "Rosée 8",
           "type": "Ingrédient · Rosée",
           "cost": "8",
-          "art": "💧",
+          "art": ":goutte",
           "color": "#14808a"
         },
         {
@@ -310,14 +310,14 @@
           "name": "Rosée 9",
           "type": "Ingrédient · Rosée",
           "cost": "9",
-          "art": "💧",
+          "art": ":goutte",
           "color": "#14808a"
         },
         {
           "id": "bourrasque",
           "name": "Bourrasque",
           "type": "Sortilège",
-          "art": "💨",
+          "art": ":vent",
           "color": "#6b3fa0",
           "text": "Chaque joueur passe une carte de sa main, face cachée, à son voisin de gauche.",
           "count": 2
@@ -326,7 +326,7 @@
           "id": "main-leste",
           "name": "Main leste",
           "type": "Sortilège",
-          "art": "🤏",
+          "art": ":main",
           "color": "#6b3fa0",
           "text": "Prenez une carte au hasard dans la main d'un adversaire.",
           "count": 2
@@ -335,7 +335,7 @@
           "id": "secateur",
           "name": "Sécateur",
           "type": "Sortilège",
-          "art": "✂️",
+          "art": ":ciseaux",
           "color": "#6b3fa0",
           "text": "Défaussez un Chardon de n'importe quel chaudron, puis piochez une carte.",
           "count": 2
@@ -344,7 +344,7 @@
           "id": "troc",
           "name": "Troc",
           "type": "Sortilège",
-          "art": "🔄",
+          "art": ":echange",
           "color": "#6b3fa0",
           "text": "Échangez un ingrédient de votre chaudron contre un ingrédient du chaudron d'un adversaire.",
           "count": 2
@@ -353,7 +353,7 @@
           "id": "double-dose",
           "name": "Double dose",
           "type": "Sortilège",
-          "art": "⚗️",
+          "art": ":fiole",
           "color": "#6b3fa0",
           "text": "Jouez immédiatement deux autres cartes.",
           "count": 2
@@ -362,7 +362,7 @@
           "id": "tisane",
           "name": "Tisane",
           "type": "Sortilège",
-          "art": "🍵",
+          "art": ":tasse",
           "color": "#6b3fa0",
           "text": "Piochez deux cartes.",
           "count": 2
@@ -371,7 +371,7 @@
           "id": "pie-voleuse",
           "name": "Pie voleuse",
           "type": "Sortilège",
-          "art": "🐦",
+          "art": ":oiseau",
           "color": "#6b3fa0",
           "text": "Prenez l'ingrédient de votre choix dans la défausse et ajoutez-le à votre main.",
           "count": 1
@@ -380,7 +380,7 @@
           "id": "grand-menage",
           "name": "Grand ménage",
           "type": "Sortilège",
-          "art": "🧹",
+          "art": ":balai",
           "color": "#6b3fa0",
           "text": "Tous les chaudrons sont vidés dans la défausse, Chardons compris.",
           "count": 1
@@ -389,7 +389,7 @@
           "id": "chardon",
           "name": "Chardon",
           "type": "Nuisance",
-          "art": "🌵",
+          "art": ":chardon",
           "color": "#4b6b2f",
           "count": 6,
           "text": "Posez-le dans le chaudron d'un adversaire : il occupe une place et empêche toute potion tant qu'il y reste."

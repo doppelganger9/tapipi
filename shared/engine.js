@@ -15,7 +15,7 @@ import { DefinitionError, normalizeMarks, normalizeNewCard } from './definition.
 const MAX_CARDS = 3000;
 const MAX_SELECTION = 300;
 const MAX_ADDED = 200;
-const STICKERS = ['⭐', '❤️', '💀', '🔥', '👑', '🩹', '❌', '✅'];
+const STICKERS = ['etoile', 'coeur', 'crane', 'flamme', 'couronne', 'pansement', 'croix', 'coche'];
 
 class ActionError extends Error {}
 
@@ -135,7 +135,8 @@ function scatter(state, key, flipChance) {
   shuffleInPlace(state, state.zones[key]);
 }
 
-const THROWABLES = ['🍅', '🧦', '🎲', '💐', '🥧', '🧻'];
+// What flies across the table: [pictogram, how the log says it].
+const THROWABLES = [['tomate', 'une tomate'], ['chaussette', 'une chaussette'], ['de', 'un dé'], ['fleur', 'un bouquet'], ['tarte', 'une tarte'], ['rouleau', 'un rouleau de papier']];
 
 function spawnCard(state, proto, key) {
   if (Object.keys(state.cards).length >= MAX_CARDS) return;
@@ -441,7 +442,7 @@ const handlers = {
       if (typeof action.note === 'string') return (verb = 'écrit sur', { ...marks, note: action.note });
       if (action.scribble === true) return (verb = 'griffonne', { ...marks, scribble: !marks.scribble });
       if (action.torn === true) return (verb = 'déchire', { ...marks, torn: true });
-      if (STICKERS.includes(action.sticker)) return (verb = `colle ${action.sticker} sur`, { ...marks, stickers: [...(marks.stickers ?? []), action.sticker].slice(-6) });
+      if (STICKERS.includes(action.sticker)) return (verb = 'colle un autocollant sur', { ...marks, stickers: [...(marks.stickers ?? []), action.sticker].slice(-6) });
       return refuse('Modification inconnue.');
     };
     for (const key of new Set(cards.map((card) => card.proto))) {
@@ -500,11 +501,11 @@ const handlers = {
     const seen = hidden.length - unseen.length;
     if (nextRandom(state) < Math.min(0.8, 0.25 + 0.15 * seen)) {
       for (const card of hidden) card.peek = card.peek.filter((s) => s !== seat);
-      emit(state, seat, `se fait prendre à lorgner le jeu de ${seatName(state, owner)} !`, { kind: 'caught', from: seat, to: owner });
+      emit(state, seat, `se fait prendre à lorgner le jeu de ${seatName(state, owner)} !`, { kind: 'caught', from: seat, to: owner, alert: true });
       return;
     }
     unseen[randomInt(state, unseen.length)].peek.push(seat);
-    whisper(state, seat, `🤫 Vous apercevez une carte de ${seatName(state, owner)}. Personne n’a rien remarqué…`);
+    whisper(state, seat, `Vous apercevez une carte de ${seatName(state, owner)}. Personne n’a rien remarqué…`);
   },
 
   sweep(state, seat, action) {
@@ -534,8 +535,8 @@ const handlers = {
 
   throw(state, seat, action) {
     if (!state.activeSeats.includes(action.seat)) refuse('Joueur inconnu.');
-    const item = THROWABLES[randomInt(state, THROWABLES.length)];
-    emit(state, seat, `lance ${item} sur ${seatName(state, action.seat)}`, { kind: 'throw', from: seat, to: action.seat, item });
+    const [item, label] = THROWABLES[randomInt(state, THROWABLES.length)];
+    emit(state, seat, `lance ${label} sur ${seatName(state, action.seat)}`, { kind: 'throw', from: seat, to: action.seat, item });
   },
 
   macro(state, seat, action) {

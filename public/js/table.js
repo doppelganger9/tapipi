@@ -6,13 +6,14 @@
 
 import { h, fill, SEAT_COLORS } from './dom.js';
 import { cardEl } from './cards.js';
+import { glyphEl } from './glyphs.js';
 import { boxScene } from './unboxing.js';
 import { parseKey, zoneKey } from '/shared/zones.js';
 
 const DOUBLE_CLICK_MS = 350;
 const DRAG_THRESHOLD = 6;
 
-const STICKERS = ['⭐', '❤️', '💀', '🔥', '👑', '🩹', '❌', '✅'];
+const STICKERS = ['etoile', 'coeur', 'crane', 'flamme', 'couronne', 'pansement', 'croix', 'coche'];
 
 export function createTable({ root, bar, menu, send, onHover, onDeal, onNote }) {
   let S = null; // { def, view, players, you }
@@ -105,7 +106,7 @@ export function createTable({ root, bar, menu, send, onHover, onDeal, onNote }) 
         h('span', { class: 'zcount' }, String(cards.length)),
         // Somebody else's hand: one may always try a glance…
         S.you >= 0 && S.def.cheating && zone.visibility === 'owner' && seat !== S.you && cards.some((c) => !c.up && !c.p)
-          && h('button', { class: 'spy', title: 'Lorgner ce jeu : une carte de plus à chaque essai… ou vous vous faites prendre', 'aria-label': `Lorgner : ${zone.name}`, onclick: () => act({ type: 'spy', zone: key }) }, '👀'),
+          && h('button', { class: 'spy', title: 'Lorgner ce jeu : une carte de plus à chaque essai… ou vous vous faites prendre', 'aria-label': `Lorgner : ${zone.name}`, onclick: () => act({ type: 'spy', zone: key }) }, glyphEl('oeil'), 'Lorgner'),
         S.you >= 0 && h('button', { class: 'zmenu', title: 'Actions sur cette zone', 'aria-label': `Actions : ${zone.name}` }, '⋯')),
       body);
   }
@@ -230,11 +231,11 @@ export function createTable({ root, bar, menu, send, onHover, onDeal, onNote }) 
         else act({ type: 'mark', cards, [kind]: value ?? true });
       } },
         h('option', { value: '', disabled: true, selected: true }, 'Marquer…'),
-        h('option', { value: 'note' }, '✏️ Écrire dessus…'),
-        h('option', { value: 'scribble' }, '〰️ Griffonner / effacer le gribouillis'),
-        h('option', { value: 'torn' }, '✂️ Déchirer'),
-        STICKERS.map((s) => h('option', { value: `sticker:${s}` }, `Coller ${s}`)),
-        h('option', { value: 'erase' }, '✨ Remettre à neuf')),
+        h('option', { value: 'note' }, 'Écrire dessus…'),
+        h('option', { value: 'scribble' }, 'Griffonner / effacer le gribouillis'),
+        h('option', { value: 'torn' }, 'Déchirer'),
+        STICKERS.map((s) => h('option', { value: `sticker:${s}` }, `Coller : ${s}`)),
+        h('option', { value: 'erase' }, 'Remettre à neuf')),
       h('button', { class: 'ghost-btn', title: 'Désélectionner', onclick: clearSelection }, '✕'),
     );
     const last = index.get(ids.at(-1))?.card;
