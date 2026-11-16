@@ -476,3 +476,4 @@ button.pack:hover:not(:disabled), button.sheet:hover:not(:disabled) { border: 0;
 .pause-who { font: 400 .85rem var(--mono); min-height: 2.6em; }
 .pause-card .big { width: 100%; background: var(--black); color: var(--yellow); }
 .pause-card .big:hover:not(:disabled) { background: var(--red) !important; color: var(--black) !important; }
+.preview .card .custom .name { white-space: normal; }

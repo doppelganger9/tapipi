@@ -1,0 +1,402 @@
+{
+  "format": "tapis/1",
+  "id": "mauvais-joueurs",
+  "name": "Mauvais Joueurs",
+  "category": "Créations Tapipi",
+  "description": "Le jeu de cartes des gens pénibles autour d’une table : le Tricheur, la Mauvaise Perdante, l’Analyste… Faites craquer le Moral de l’adversaire avant qu’il ne renverse la table.",
+  "author": "Tapipi",
+  "license": "CC-BY-4.0",
+  "duration": "20 min",
+  "players": {
+    "min": 2,
+    "max": 4
+  },
+  "quickstart": [
+    "Chacun a son paquet, 5 cartes en main et 12 de Moral. À zéro, on quitte la table : le dernier a gagné.",
+    "Pour jouer une carte, défaussez de votre main autant de cartes que son coût (en haut à droite).",
+    "Vos Joueurs (rouges) font chacun une remarque par tour : inclinez-les par un double-clic.",
+    "Culot de l’attaquant ≥ Sang-froid du défenseur : il est vexé, à la défausse. Table adverse vide : il perd du Moral.",
+    "« Fin du tour » : le suivant pioche deux cartes tout seul. Les règles complètes sont dans « Règles »."
+  ],
+  "rules": "MAUVAIS JOUEURS — le jeu de cartes des gens pénibles autour d'une table.\n\nDeux à quatre joueurs. Chacun a le même paquet de 42 cartes et 12 points de Moral. Le dernier à qui il reste du Moral a gagné : les autres ont quitté la table en claquant la porte.\n\nLES CARTES\n• Joueur (rouge) : reste sur votre table. En bas à droite, son Culot / son Sang-froid.\n• Coup bas (noir) : fait ce qui est écrit, puis va à la défausse.\n• Accessoire (bleu) : reste sur votre table et agit tant qu'il y est.\nLe chiffre en haut à droite est le coût.\n\nPAYER\nPour jouer une carte, défaussez de votre main autant d'autres cartes que son coût. Une carte de coût 0 est gratuite.\n\nUN TOUR\n1. Redressez vos cartes inclinées et piochez deux cartes (c'est automatique quand le tour précédent se termine).\n2. Jouez autant de cartes que vous voulez et pouvez payer.\n3. Chacun de vos Joueurs peut faire une remarque désobligeante, une fois : inclinez-le.\n   — Contre un Joueur adverse : si le Culot du vôtre atteint ou dépasse le Sang-froid de l'autre, celui-ci est vexé et va à la défausse. Sinon, il ne se passe rien, à part un silence gêné.\n   — Contre l'adversaire lui-même, seulement si sa table n'a aucun Joueur : il perd autant de Moral que le Culot du vôtre.\n4. « Fin du tour ».\n\nDÉTAILS\n• Un Joueur peut faire une remarque dès le tour où il arrive, sauf mention contraire.\n• Personne ne fait de remarque au tout premier tour de la partie.\n• Pioche vide ? Mélangez votre défausse pour en refaire une (« Recycler ma défausse ») et perdez 1 Moral : la soirée s'éternise.\n• Les jetons servent à noter les bonus et les malus qui durent.\n• Les cartes qui vous demandent de lorgner, de lancer une tomate ou de renverser votre café sont à prendre au pied de la lettre.\n• En cas de désaccord sur une règle, celui qui a le plus de Moral a raison.",
+  "decks": {
+    "paquet": {
+      "name": "Paquet de départ (42 cartes)",
+      "back": {
+        "color": "#c4260a",
+        "label": "!"
+      },
+      "cards": [
+        {
+          "id": "debutant",
+          "name": "Le Débutant",
+          "type": "Joueur",
+          "cost": "0",
+          "stats": "1/1",
+          "art": ":coche",
+          "color": "#c4260a",
+          "count": 3,
+          "text": "« Et là, je fais quoi ? » Gratuit, plein de bonne volonté, vite vexé."
+        },
+        {
+          "id": "bavard",
+          "name": "Le Bavard",
+          "type": "Joueur",
+          "cost": "1",
+          "stats": "1/2",
+          "art": ":vent",
+          "color": "#c4260a",
+          "count": 2,
+          "text": "Tant qu’il est sur votre table, l’adversaire doit annoncer à voix haute tout ce qu’il fait. S’il oublie : −1 Moral."
+        },
+        {
+          "id": "analyste",
+          "name": "L’Analyste",
+          "type": "Joueur",
+          "cost": "1",
+          "stats": "0/5",
+          "art": ":lune",
+          "color": "#c4260a",
+          "count": 2,
+          "text": "Ne fait jamais de remarque : il réfléchit. Tant qu’il est là, vos autres Joueurs ne peuvent pas être vexés par un Coup bas."
+        },
+        {
+          "id": "grignoteur",
+          "name": "Le Grignoteur",
+          "type": "Joueur",
+          "cost": "1",
+          "stats": "1/3",
+          "art": ":tarte",
+          "color": "#c4260a",
+          "count": 2,
+          "text": "Quand il arrive : posez un jeton gras sur un Joueur adverse. Il a −1 Culot tant qu’il garde le jeton."
+        },
+        {
+          "id": "tricheur",
+          "name": "Le Tricheur",
+          "type": "Joueur",
+          "cost": "2",
+          "stats": "3/1",
+          "art": ":oeil",
+          "color": "#c4260a",
+          "count": 2,
+          "text": "Quand il arrive : utilisez une fois le bouton « Lorgner » sur la main adverse. Si vous vous faites prendre, défaussez le Tricheur."
+        },
+        {
+          "id": "lecteur",
+          "name": "Le Lecteur de règles",
+          "type": "Joueur",
+          "cost": "2",
+          "stats": "1/4",
+          "art": ":parchemin",
+          "color": "#c4260a",
+          "count": 2,
+          "text": "« Attendez, je vérifie. » Tant qu’il est là, les Coups bas de l’adversaire coûtent 1 de plus."
+        },
+        {
+          "id": "chanceuse",
+          "name": "La Chanceuse",
+          "type": "Joueur",
+          "cost": "2",
+          "stats": "?/2",
+          "art": ":de",
+          "color": "#c4260a",
+          "count": 2,
+          "text": "Quand elle fait une remarque, lancez le dé : son Culot vaut la moitié du résultat, arrondie au-dessus."
+        },
+        {
+          "id": "retardataire",
+          "name": "Le Retardataire",
+          "type": "Joueur",
+          "cost": "2",
+          "stats": "4/3",
+          "art": ":chaussette",
+          "color": "#c4260a",
+          "count": 2,
+          "text": "Arrive incliné : il ne fait pas de remarque le tour où il est posé."
+        },
+        {
+          "id": "perdante",
+          "name": "La Mauvaise Perdante",
+          "type": "Joueur",
+          "cost": "3",
+          "stats": "2/4",
+          "art": ":flamme",
+          "color": "#c4260a",
+          "count": 2,
+          "text": "Quand elle est vexée, elle ne part pas sans rien dire : l’adversaire perd 1 Moral."
+        },
+        {
+          "id": "optimisateur",
+          "name": "L’Optimisateur",
+          "type": "Joueur",
+          "cost": "3",
+          "stats": "3/2",
+          "art": ":diamant",
+          "color": "#c4260a",
+          "count": 2,
+          "text": "Quand il arrive : piochez une carte. Il avait tout calculé."
+        },
+        {
+          "id": "capitaine",
+          "name": "La Capitaine de soirée",
+          "type": "Joueur",
+          "cost": "3",
+          "stats": "2/3",
+          "art": ":etoile",
+          "color": "#c4260a",
+          "count": 1,
+          "text": "Vos autres Joueurs ont +1 Culot. C’est elle qui a apporté le jeu, après tout."
+        },
+        {
+          "id": "maitre",
+          "name": "Le Maître du jeu",
+          "type": "Joueur",
+          "cost": "3",
+          "stats": "4/5",
+          "art": ":couronne",
+          "color": "#c4260a",
+          "count": 1,
+          "text": "Il ne peut y en avoir qu’un sur votre table. « C’est moi qui explique. »"
+        },
+        {
+          "id": "tomate",
+          "name": "Tomate bien mûre",
+          "type": "Coup bas",
+          "cost": "1",
+          "art": ":tomate",
+          "color": "#0b0b0b",
+          "count": 2,
+          "text": "Vexez un Joueur adverse dont le Sang-froid est de 2 ou moins. Lancez quelque chose sur votre adversaire, pour la forme."
+        },
+        {
+          "id": "cafe",
+          "name": "Café renversé",
+          "type": "Coup bas",
+          "cost": "1",
+          "art": ":tasse",
+          "color": "#0b0b0b",
+          "count": 2,
+          "text": "Un Joueur adverse a −2 Sang-froid jusqu’à la fin du tour. Renversez votre café : il faut ce qu’il faut."
+        },
+        {
+          "id": "pause",
+          "name": "Pause pipi",
+          "type": "Coup bas",
+          "cost": "1",
+          "art": ":rouleau",
+          "color": "#0b0b0b",
+          "count": 2,
+          "text": "Inclinez un Joueur adverse : il ne fera pas de remarque à son prochain tour."
+        },
+        {
+          "id": "manche",
+          "name": "Carte dans la manche",
+          "type": "Coup bas",
+          "cost": "1",
+          "art": ":main",
+          "color": "#0b0b0b",
+          "count": 2,
+          "text": "Piochez deux cartes."
+        },
+        {
+          "id": "regles",
+          "name": "« C’est pas dans les règles ! »",
+          "type": "Coup bas",
+          "cost": "2",
+          "art": ":croix",
+          "color": "#0b0b0b",
+          "count": 2,
+          "text": "À jouer pendant le tour adverse : annulez le Coup bas qu’il vient de jouer. Il le défausse quand même."
+        },
+        {
+          "id": "mauvaise-foi",
+          "name": "Mauvaise foi",
+          "type": "Coup bas",
+          "cost": "2",
+          "art": ":eclair",
+          "color": "#0b0b0b",
+          "count": 2,
+          "text": "Un de vos Joueurs a +3 Culot jusqu’à la fin du tour."
+        },
+        {
+          "id": "relecture",
+          "name": "Relecture des règles",
+          "type": "Coup bas",
+          "cost": "2",
+          "art": ":pansement",
+          "color": "#0b0b0b",
+          "count": 1,
+          "text": "Regagnez 3 Moral (sans dépasser 12). Tout le monde souffle un peu."
+        },
+        {
+          "id": "table",
+          "name": "Renverser la table",
+          "type": "Coup bas",
+          "cost": "3",
+          "art": ":crane",
+          "color": "#0b0b0b",
+          "count": 1,
+          "text": "Tous les Joueurs de toutes les tables sont défaussés. Cliquez sur le bouton, vous en mourez d’envie."
+        },
+        {
+          "id": "chips",
+          "name": "Bol de chips",
+          "type": "Accessoire",
+          "cost": "1",
+          "art": ":champignon",
+          "color": "#1f4e79",
+          "count": 2,
+          "text": "Reste sur votre table. Au début de votre tour, piochez une carte de plus."
+        },
+        {
+          "id": "tapis",
+          "name": "Tapis de jeu",
+          "type": "Accessoire",
+          "cost": "2",
+          "art": ":sapin",
+          "color": "#1f4e79",
+          "count": 1,
+          "text": "Reste sur votre table. Vos Joueurs ont +1 Sang-froid."
+        },
+        {
+          "id": "de-pipe",
+          "name": "Dé pipé",
+          "type": "Accessoire",
+          "cost": "1",
+          "art": ":de",
+          "color": "#1f4e79",
+          "count": 1,
+          "text": "Reste sur votre table. Une fois par tour, relancez un dé que vous venez de lancer."
+        },
+        {
+          "id": "chrono",
+          "name": "Chronomètre",
+          "type": "Accessoire",
+          "cost": "2",
+          "art": ":coeur",
+          "color": "#1f4e79",
+          "count": 1,
+          "text": "Reste sur votre table. L’adversaire a trente secondes par tour. S’il dépasse : −1 Moral. Comptez à voix haute, c’est plus pénible."
+        }
+      ]
+    }
+  },
+  "zones": [
+    {
+      "id": "pioche",
+      "name": "Ma pioche",
+      "owner": "player",
+      "visibility": "hidden",
+      "layout": "stack"
+    },
+    {
+      "id": "table",
+      "name": "Ma table",
+      "owner": "player",
+      "layout": "row"
+    },
+    {
+      "id": "defausse",
+      "name": "Ma défausse",
+      "owner": "player",
+      "layout": "stack"
+    },
+    {
+      "id": "main",
+      "name": "Main",
+      "owner": "player",
+      "visibility": "owner",
+      "layout": "row"
+    }
+  ],
+  "counters": [
+    {
+      "id": "moral",
+      "name": "Moral",
+      "scope": "player",
+      "initial": 12
+    }
+  ],
+  "ui": {
+    "hand": "main",
+    "draw": "pioche",
+    "play": "table"
+  },
+  "setup": [
+    {
+      "op": "spawn",
+      "deck": "paquet",
+      "to": "pioche"
+    },
+    {
+      "op": "shuffle",
+      "zone": "pioche"
+    },
+    {
+      "op": "move",
+      "from": "pioche",
+      "to": "main",
+      "count": 5
+    }
+  ],
+  "macros": [
+    {
+      "id": "debut",
+      "name": "Début de tour : piocher 2",
+      "group": "À mon tour",
+      "scope": "me",
+      "on": "turnStart",
+      "steps": [
+        {
+          "op": "move",
+          "from": "pioche",
+          "to": "main",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "id": "piocher",
+      "name": "Piocher…",
+      "group": "À mon tour",
+      "scope": "me",
+      "params": [
+        {
+          "id": "n",
+          "name": "Cartes à piocher",
+          "min": 1,
+          "max": 5,
+          "default": 1
+        }
+      ],
+      "steps": [
+        {
+          "op": "move",
+          "from": "pioche",
+          "to": "main",
+          "count": "$n"
+        }
+      ]
+    },
+    {
+      "id": "recycler",
+      "name": "Recycler ma défausse",
+      "group": "À mon tour",
+      "scope": "me",
+      "steps": [
+        {
+          "op": "move",
+          "from": "defausse",
+          "to": "pioche",
+          "count": "all",
+          "faceUp": false
+        },
+        {
+          "op": "shuffle",
+          "zone": "pioche"
+        }
+      ]
+    }
+  ]
+}
