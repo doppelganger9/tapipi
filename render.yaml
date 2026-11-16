@@ -1,0 +1,13 @@
+# Déploiement en un clic sur Render : https://render.com/deploy?repo=https://github.com/doppelganger9/tapipi
+services:
+  - type: web
+    name: tapipi
+    runtime: node
+    plan: free
+    region: frankfurt
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /api/games
+    envVars:
+      - key: NODE_VERSION
+        value: "22"

@@ -1,5 +1,7 @@
 # Tapipi
 
+[![Déployer sur Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/doppelganger9/tapipi)
+
 Une table de jeu multijoueur en ligne qui ne connaît aucun jeu : elle simule une table
 (cartes, tuiles, pions, zones, compteurs, dés) et charge un **fichier de jeu** qui décrit le
 matériel. Les règles sont appliquées par les joueurs, comme autour d'une vraie table.
