@@ -1,0 +1,143 @@
+{
+  "format": "tapis/1",
+  "id": "classique-32",
+  "name": "Jeu de 32 cartes",
+  "description": "Le paquet de 32 cartes (du 7 à l'as) des jeux de levées traditionnels : belote, manille, écarté…",
+  "author": "Tapis",
+  "license": "CC0-1.0",
+  "players": {
+    "min": 2,
+    "max": 4
+  },
+  "rules": "Table libre avec un jeu de 32 cartes.\n\nJouez une carte en la glissant sur le tapis (ou double-clic depuis votre main). Le gagnant du pli sélectionne les cartes du tapis et les glisse sur sa pile « Plis ».\n\nUtilisez le compteur de score et « Fin du tour » pour suivre la partie.",
+  "decks": {
+    "main": {
+      "preset": "standard32",
+      "back": {
+        "color": "#1f4e79",
+        "label": "❖"
+      }
+    }
+  },
+  "zones": [
+    {
+      "id": "talon",
+      "name": "Talon",
+      "visibility": "hidden",
+      "layout": "stack"
+    },
+    {
+      "id": "tapis",
+      "name": "Tapis",
+      "visibility": "public",
+      "layout": "free"
+    },
+    {
+      "id": "main",
+      "name": "Main",
+      "owner": "player",
+      "visibility": "owner",
+      "layout": "row"
+    },
+    {
+      "id": "plis",
+      "name": "Plis",
+      "owner": "player",
+      "visibility": "hidden",
+      "layout": "stack"
+    }
+  ],
+  "counters": [
+    {
+      "id": "score",
+      "name": "Score",
+      "scope": "player",
+      "initial": 0
+    }
+  ],
+  "ui": {
+    "hand": "main",
+    "draw": "talon",
+    "play": "tapis"
+  },
+  "setup": [
+    {
+      "op": "spawn",
+      "deck": "main",
+      "to": "talon"
+    },
+    {
+      "op": "shuffle",
+      "zone": "talon"
+    }
+  ],
+  "macros": [
+    {
+      "id": "ramasser",
+      "name": "Tout ramasser et mélanger",
+      "steps": [
+        {
+          "op": "gather",
+          "to": "talon"
+        },
+        {
+          "op": "shuffle",
+          "zone": "talon"
+        }
+      ]
+    },
+    {
+      "id": "donne5",
+      "name": "Distribuer 5 cartes à chacun",
+      "steps": [
+        {
+          "op": "deal",
+          "from": "talon",
+          "to": "main",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "id": "donne3",
+      "name": "Distribuer 3 cartes à chacun",
+      "steps": [
+        {
+          "op": "deal",
+          "from": "talon",
+          "to": "main",
+          "count": 3
+        }
+      ]
+    },
+    {
+      "id": "donneTout",
+      "name": "Distribuer tout le paquet",
+      "steps": [
+        {
+          "op": "deal",
+          "from": "talon",
+          "to": "main",
+          "count": "all"
+        }
+      ]
+    },
+    {
+      "id": "retourne",
+      "name": "Retourner une carte du talon",
+      "steps": [
+        {
+          "op": "move",
+          "from": "talon",
+          "to": "tapis",
+          "count": 1
+        }
+      ]
+    }
+  ],
+  "quickstart": [
+    "Distribuez avec une action de table (à droite).",
+    "Double-clic sur une carte de votre main pour la jouer sur le tapis.",
+    "Le gagnant du pli sélectionne les cartes et les glisse sur sa pile « Plis »."
+  ]
+}

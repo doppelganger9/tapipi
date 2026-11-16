@@ -1,0 +1,156 @@
+{
+  "format": "tapis/1",
+  "id": "estimation-equipe",
+  "name": "Estimation d'équipe",
+  "description": "Pour chiffrer des tâches entre collègues : chacun pose une carte face cachée, puis on révèle tout en même temps.",
+  "author": "Tapis",
+  "license": "CC0-1.0",
+  "players": {
+    "min": 2,
+    "max": 8
+  },
+  "rules": "1. Quelqu'un présente la tâche à estimer.\n2. Chacun choisit une carte dans sa main et la pose (double-clic) : elle arrive face cachée dans sa zone « Vote ».\n3. Quand tout le monde a voté, lancez l'action de table « Révéler les votes ».\n4. Les extrêmes s'expliquent, on discute, puis « Nouveau vote ».\n\n? = je ne sais pas · ☕ = j'ai besoin d'une pause.",
+  "table": {
+    "color": "#22384f"
+  },
+  "decks": {
+    "votes": {
+      "back": {
+        "color": "#0f5c8a",
+        "label": "?"
+      },
+      "cards": [
+        {
+          "id": "0",
+          "name": "0",
+          "art": "0",
+          "color": "#5b6b7a"
+        },
+        {
+          "id": "1",
+          "name": "1",
+          "art": "1",
+          "color": "#2e8b57"
+        },
+        {
+          "id": "2",
+          "name": "2",
+          "art": "2",
+          "color": "#2e8b57"
+        },
+        {
+          "id": "3",
+          "name": "3",
+          "art": "3",
+          "color": "#2e8b57"
+        },
+        {
+          "id": "5",
+          "name": "5",
+          "art": "5",
+          "color": "#b8860b"
+        },
+        {
+          "id": "8",
+          "name": "8",
+          "art": "8",
+          "color": "#b8860b"
+        },
+        {
+          "id": "13",
+          "name": "13",
+          "art": "13",
+          "color": "#c2571a"
+        },
+        {
+          "id": "21",
+          "name": "21",
+          "art": "21",
+          "color": "#c2571a"
+        },
+        {
+          "id": "40",
+          "name": "40",
+          "art": "40",
+          "color": "#a82a2a"
+        },
+        {
+          "id": "100",
+          "name": "100",
+          "art": "100",
+          "color": "#a82a2a"
+        },
+        {
+          "id": "q",
+          "name": "Je ne sais pas",
+          "art": "?",
+          "color": "#5b6b7a"
+        },
+        {
+          "id": "pause",
+          "name": "Pause",
+          "art": "☕",
+          "color": "#6b4a2f"
+        }
+      ]
+    }
+  },
+  "zones": [
+    {
+      "id": "vote",
+      "name": "Vote",
+      "owner": "player",
+      "visibility": "hidden",
+      "layout": "row"
+    },
+    {
+      "id": "main",
+      "name": "Main",
+      "owner": "player",
+      "visibility": "owner",
+      "layout": "row"
+    }
+  ],
+  "ui": {
+    "hand": "main",
+    "play": "vote"
+  },
+  "setup": [
+    {
+      "op": "spawn",
+      "deck": "votes",
+      "to": "main"
+    }
+  ],
+  "macros": [
+    {
+      "id": "reveler",
+      "name": "Révéler les votes",
+      "steps": [
+        {
+          "op": "flip",
+          "zone": "vote",
+          "faceUp": true
+        }
+      ]
+    },
+    {
+      "id": "nouveau",
+      "name": "Nouveau vote",
+      "steps": [
+        {
+          "op": "move",
+          "from": "vote",
+          "to": "main",
+          "count": "all"
+        }
+      ]
+    }
+  ],
+  "duration": "2 min par vote",
+  "quickstart": [
+    "Double-clic sur une carte de votre main : votre vote part face cachée.",
+    "Quand tout le monde a voté : « Révéler les votes ».",
+    "On discute des écarts, puis « Nouveau vote »."
+  ]
+}

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tapis — la table de jeu qui joue à tout</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <main id="lobby">
+    <header class="hero">
+      <h1>Tapis</h1>
+      <p>Une table, des cartes, vos règles. Envoyez un lien, tout le monde s'assoit — sans compte ni installation.</p>
+    </header>
+
+    <section id="invite" class="panel invite" hidden>
+      <p class="kicker">Vous êtes invité·e</p>
+      <h2 id="inviteTitle"></h2>
+      <p id="inviteGame" class="muted"></p>
+    </section>
+
+    <section class="panel identity">
+      <label for="name">Votre nom autour de la table</label>
+      <div class="inline">
+        <input id="name" maxlength="20" autocomplete="nickname">
+        <button id="reroll" type="button" title="Tirer un autre surnom" aria-label="Tirer un autre surnom">🎲</button>
+      </div>
+      <button id="sitBtn" class="primary big" hidden>S'asseoir à la table</button>
+    </section>
+
+    <section id="create" class="panel">
+      <h2>Ouvrir une table</h2>
+      <p class="muted">Choisissez un jeu : la table s'ouvre aussitôt et vous recevez un lien à envoyer.</p>
+      <div id="picker" class="picker"></div>
+      <details class="code">
+        <summary>J'ai reçu un code de table</summary>
+        <form id="joinForm" class="inline">
+          <input id="code" maxlength="5" placeholder="CODE" aria-label="Code de la table" autocapitalize="characters">
+          <button>Rejoindre</button>
+        </form>
+      </details>
+    </section>
+
+    <footer class="fine">
+      Tapis ne fournit que des jeux traditionnels du domaine public et des jeux originaux. Les fichiers que vous chargez
+      restent sur votre table privée et disparaissent avec elle : ne chargez que des contenus que vous avez le droit d'utiliser.
+    </footer>
+  </main>
+
+  <div id="game" hidden>
+    <header class="topbar">
+      <strong class="brand">Tapis</strong>
+      <span id="gameName"></span>
+      <button id="share" class="primary" title="Inviter d'autres joueurs">Inviter</button>
+      <span id="status" class="status" hidden>Reconnexion…</span>
+      <span class="spacer"></span>
+      <label class="felt" title="Couleur de votre tapis">Tapis <input type="color" id="felt"></label>
+      <button id="helpBtn" title="Revoir le tutoriel">Aide</button>
+      <button id="rulesBtn">Règles</button>
+      <button id="restartBtn" class="host-only">Nouvelle partie</button>
+      <button id="changeBtn" class="host-only">Changer de jeu</button>
+      <button id="quitBtn">Quitter</button>
+    </header>
+    <div class="layout">
+      <section id="table" aria-label="Table de jeu"></section>
+      <aside class="side">
+        <div id="preview" class="preview"><p class="hint">Survolez une carte pour la lire en grand.</p></div>
+        <div id="players" class="players"></div>
+        <div id="actions" class="actions"></div>
+        <div id="log" class="log" aria-live="polite"></div>
+        <form id="chat" class="inline"><input id="chatInput" maxlength="300" placeholder="Écrire à la table…" aria-label="Message"><button>↵</button></form>
+      </aside>
+    </div>
+    <div id="bar" class="bar" hidden></div>
+    <div id="menu" class="menu" hidden></div>
+    <div id="coach" class="coach" hidden role="status"></div>
+  </div>
+
+  <dialog id="welcomeDlg" class="welcome">
+    <p class="kicker" id="wKicker"></p>
+    <h2 id="wTitle"></h2>
+    <div class="invitebox">
+      <p id="wInviteText"></p>
+      <div class="inline">
+        <input id="wLink" readonly aria-label="Lien d'invitation">
+        <button id="wCopy" class="primary" type="button">Copier le lien</button>
+        <button id="wShare" type="button" hidden>Partager</button>
+      </div>
+      <p id="wWho" class="who-list"></p>
+    </div>
+    <div id="wHow">
+      <h3>Comment jouer</h3>
+      <ol id="wSteps"></ol>
+    </div>
+    <div class="dlg-actions">
+      <button id="wRules" type="button">Règles complètes</button>
+      <button id="wGo" class="primary big" type="button">C'est parti</button>
+    </div>
+  </dialog>
+  <dialog id="rulesDlg"><h2 id="rulesTitle"></h2><pre id="rulesText"></pre><form method="dialog"><button class="primary">Fermer</button></form></dialog>
+  <dialog id="changeDlg"><h2>Changer de jeu</h2><div id="picker2" class="picker"></div><form method="dialog"><button>Annuler</button></form></dialog>
+  <div id="toast" class="toast" hidden role="alert"></div>
+  <script type="module" src="/js/main.js"></script>
+</body>
+</html>

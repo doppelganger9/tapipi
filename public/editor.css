@@ -1,0 +1,18 @@
+body { display: flex; flex-direction: column; }
+.editor { flex: 1; min-height: 0; display: grid; grid-template-columns: 300px 1fr 320px; gap: 10px; padding: 10px; }
+.editor .panel { overflow-y: auto; min-height: 0; }
+.editor label { display: block; color: var(--muted); font-size: .82rem; margin-bottom: 8px; }
+.editor label input, .editor label textarea, .editor label select { display: block; width: 100%; margin-top: 2px; color: var(--ink); }
+.editor textarea { font: inherit; background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; padding: .4rem .6rem; resize: vertical; }
+.editor input[type=color] { padding: 2px; height: 32px; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+.row h2 { margin: 0; }
+.spacer { flex: 1; }
+.thumbs { --cw: 92px; display: flex; flex-wrap: wrap; gap: 12px; padding: 8px 4px; }
+.thumbs .card { cursor: pointer; }
+.hint.left { text-align: left; padding: 0; }
+.validity { font-size: .85rem; color: #7bd389; }
+.validity.bad { color: #ffb4a8; }
+.primary-link { background: var(--gold); border-color: var(--gold); color: #1c1608; font-weight: 600; }
+@media (max-width: 980px) { .editor { grid-template-columns: 1fr; } .editor .panel { overflow: visible; } .preview { display: grid; } }

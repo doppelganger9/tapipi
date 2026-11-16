@@ -1,0 +1,18 @@
+{
+  "name": "tapis",
+  "version": "0.1.0",
+  "description": "Table de jeu de cartes multijoueur générique, pilotée par des fichiers de jeu",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "start": "node server/index.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "ws": "^8.23.0"
+  }
+}

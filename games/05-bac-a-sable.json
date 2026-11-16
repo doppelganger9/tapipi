@@ -1,0 +1,177 @@
+{
+  "format": "tapis/1",
+  "id": "bac-a-sable",
+  "name": "Bac à sable : plateau et pions",
+  "description": "Un plateau, des pions empilables, des tuiles carrées et des cartes de toutes tailles. Pour inventer un jeu ou jouer aux dames.",
+  "author": "Tapis",
+  "license": "CC0-1.0",
+  "players": {
+    "min": 1,
+    "max": 6
+  },
+  "quickstart": [
+    "Glissez les pions de la réserve vers le plateau : ils s’empilent librement.",
+    "Cliquez sur un pion ou une tuile pour le retourner, l’incliner ou y poser un jeton.",
+    "Le plateau est fixé : rien ne le déplace, même si quelqu’un renverse la table."
+  ],
+  "rules": "Aucune règle : ce jeu montre ce que le format permet.\n\nDans le fichier, chaque composant a une forme (shape : card, square, round), une taille (size : 1 = une carte standard, 4.6 = ce plateau) et un format (ratio = hauteur / largeur). « fixed » le visse à la table.",
+  "table": {
+    "color": "#3d3226"
+  },
+  "decks": {
+    "plateau": {
+      "cards": [
+        {
+          "id": "plateau",
+          "name": "Plateau",
+          "shape": "square",
+          "size": 4.6,
+          "fixed": true,
+          "image": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9Ii0xMCAtMTAgNDIwIDQyMCI+PHJlY3QgeD0iLTEwIiB5PSItMTAiIHdpZHRoPSI0MjAiIGhlaWdodD0iNDIwIiBmaWxsPSIjNmI0YTJmIi8+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiBmaWxsPSIjZjFlNmM4Ii8+PHJlY3QgeD0iNTAiIHk9IjAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgZmlsbD0iI2M5YjQ4YSIvPjxyZWN0IHg9IjEwMCIgeT0iMCIgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiBmaWxsPSIjZjFlNmM4Ii8+PHJlY3QgeD0iMTUwIiB5PSIwIiB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IiNjOWI0OGEiLz48cmVjdCB4PSIyMDAiIHk9IjAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgZmlsbD0iI2YxZTZjOCIvPjxyZWN0IHg9IjI1MCIgeT0iMCIgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiBmaWxsPSIjYzliNDhhIi8+PHJlY3QgeD0iMzAwIiB5PSIwIiB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IiNmMWU2YzgiLz48cmVjdCB4PSIzNTAiIHk9IjAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgZmlsbD0iI2M5YjQ4YSIvPjxyZWN0IHg9IjAiIHk9IjUwIiB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IiNjOWI0OGEiLz48cmVjdCB4PSI1MCIgeT0iNTAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgZmlsbD0iI2YxZTZjOCIvPjxyZWN0IHg9IjEwMCIgeT0iNTAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgZmlsbD0iI2M5YjQ4YSIvPjxyZWN0IHg9IjE1MCIgeT0iNTAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgZmlsbD0iI2YxZTZjOCIvPjxyZWN0IHg9IjIwMCIgeT0iNTAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgZmlsbD0iI2M5YjQ4YSIvPjxyZWN0IHg9IjI1MCIgeT0iNTAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgZmlsbD0iI2YxZTZjOCIvPjxyZWN0IHg9IjMwMCIgeT0iNTAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgZmlsbD0iI2M5YjQ4YSIvPjxyZWN0IHg9IjM1MCIgeT0iNTAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgZmlsbD0iI2YxZTZjOCIvPjxyZWN0IHg9IjAiIHk9IjEwMCIgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiBmaWxsPSIjZjFlNmM4Ii8+PHJlY3QgeD0iNTAiIHk9IjEwMCIgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiBmaWxsPSIjYzliNDhhIi8+PHJlY3QgeD0iMTAwIiB5PSIxMDAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgZmlsbD0iI2YxZTZjOCIvPjxyZWN0IHg9IjE1MCIgeT0iMTAwIiB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IiNjOWI0OGEiLz48cmVjdCB4PSIyMDAiIHk9IjEwMCIgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiBmaWxsPSIjZjFlNmM4Ii8+PHJlY3QgeD0iMjUwIiB5PSIxMDAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgZmlsbD0iI2M5YjQ4YSIvPjxyZWN0IHg9IjMwMCIgeT0iMTAwIiB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IiNmMWU2YzgiLz48cmVjdCB4PSIzNTAiIHk9IjEwMCIgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiBmaWxsPSIjYzliNDhhIi8+PHJlY3QgeD0iMCIgeT0iMTUwIiB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IiNjOWI0OGEiLz48cmVjdCB4PSI1MCIgeT0iMTUwIiB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IiNmMWU2YzgiLz48cmVjdCB4PSIxMDAiIHk9IjE1MCIgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiBmaWxsPSIjYzliNDhhIi8+PHJlY3QgeD0iMTUwIiB5PSIxNTAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgZmlsbD0iI2YxZTZjOCIvPjxyZWN0IHg9IjIwMCIgeT0iMTUwIiB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IiNjOWI0OGEiLz48cmVjdCB4PSIyNTAiIHk9IjE1MCIgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiBmaWxsPSIjZjFlNmM4Ii8+PHJlY3QgeD0iMzAwIiB5PSIxNTAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgZmlsbD0iI2M5YjQ4YSIvPjxyZWN0IHg9IjM1MCIgeT0iMTUwIiB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IiNmMWU2YzgiLz48cmVjdCB4PSIwIiB5PSIyMDAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgZmlsbD0iI2YxZTZjOCIvPjxyZWN0IHg9IjUwIiB5PSIyMDAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgZmlsbD0iI2M5YjQ4YSIvPjxyZWN0IHg9IjEwMCIgeT0iMjAwIiB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IiNmMWU2YzgiLz48cmVjdCB4PSIxNTAiIHk9IjIwMCIgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiBmaWxsPSIjYzliNDhhIi8+PHJlY3QgeD0iMjAwIiB5PSIyMDAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgZmlsbD0iI2YxZTZjOCIvPjxyZWN0IHg9IjI1MCIgeT0iMjAwIiB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IiNjOWI0OGEiLz48cmVjdCB4PSIzMDAiIHk9IjIwMCIgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiBmaWxsPSIjZjFlNmM4Ii8+PHJlY3QgeD0iMzUwIiB5PSIyMDAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgZmlsbD0iI2M5YjQ4YSIvPjxyZWN0IHg9IjAiIHk9IjI1MCIgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiBmaWxsPSIjYzliNDhhIi8+PHJlY3QgeD0iNTAiIHk9IjI1MCIgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiBmaWxsPSIjZjFlNmM4Ii8+PHJlY3QgeD0iMTAwIiB5PSIyNTAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgZmlsbD0iI2M5YjQ4YSIvPjxyZWN0IHg9IjE1MCIgeT0iMjUwIiB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IiNmMWU2YzgiLz48cmVjdCB4PSIyMDAiIHk9IjI1MCIgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiBmaWxsPSIjYzliNDhhIi8+PHJlY3QgeD0iMjUwIiB5PSIyNTAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgZmlsbD0iI2YxZTZjOCIvPjxyZWN0IHg9IjMwMCIgeT0iMjUwIiB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IiNjOWI0OGEiLz48cmVjdCB4PSIzNTAiIHk9IjI1MCIgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiBmaWxsPSIjZjFlNmM4Ii8+PHJlY3QgeD0iMCIgeT0iMzAwIiB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IiNmMWU2YzgiLz48cmVjdCB4PSI1MCIgeT0iMzAwIiB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IiNjOWI0OGEiLz48cmVjdCB4PSIxMDAiIHk9IjMwMCIgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiBmaWxsPSIjZjFlNmM4Ii8+PHJlY3QgeD0iMTUwIiB5PSIzMDAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgZmlsbD0iI2M5YjQ4YSIvPjxyZWN0IHg9IjIwMCIgeT0iMzAwIiB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IiNmMWU2YzgiLz48cmVjdCB4PSIyNTAiIHk9IjMwMCIgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiBmaWxsPSIjYzliNDhhIi8+PHJlY3QgeD0iMzAwIiB5PSIzMDAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgZmlsbD0iI2YxZTZjOCIvPjxyZWN0IHg9IjM1MCIgeT0iMzAwIiB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IiNjOWI0OGEiLz48cmVjdCB4PSIwIiB5PSIzNTAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgZmlsbD0iI2M5YjQ4YSIvPjxyZWN0IHg9IjUwIiB5PSIzNTAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgZmlsbD0iI2YxZTZjOCIvPjxyZWN0IHg9IjEwMCIgeT0iMzUwIiB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IiNjOWI0OGEiLz48cmVjdCB4PSIxNTAiIHk9IjM1MCIgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiBmaWxsPSIjZjFlNmM4Ii8+PHJlY3QgeD0iMjAwIiB5PSIzNTAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgZmlsbD0iI2M5YjQ4YSIvPjxyZWN0IHg9IjI1MCIgeT0iMzUwIiB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IiNmMWU2YzgiLz48cmVjdCB4PSIzMDAiIHk9IjM1MCIgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiBmaWxsPSIjYzliNDhhIi8+PHJlY3QgeD0iMzUwIiB5PSIzNTAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgZmlsbD0iI2YxZTZjOCIvPjwvc3ZnPg=="
+        }
+      ]
+    },
+    "materiel": {
+      "back": {
+        "color": "#4a5562",
+        "label": "◆"
+      },
+      "cards": [
+        {
+          "id": "pion-rouge",
+          "name": "Pion rouge",
+          "shape": "round",
+          "size": 0.5,
+          "color": "#c0392b",
+          "count": 8
+        },
+        {
+          "id": "pion-bleu",
+          "name": "Pion bleu",
+          "shape": "round",
+          "size": 0.5,
+          "color": "#2f6fb3",
+          "count": 8
+        },
+        {
+          "id": "pion-vert",
+          "name": "Pion vert",
+          "shape": "round",
+          "size": 0.5,
+          "color": "#2e8b57",
+          "count": 8
+        },
+        {
+          "id": "pion-jaune",
+          "name": "Pion jaune",
+          "shape": "round",
+          "size": 0.5,
+          "color": "#d4a017",
+          "count": 8
+        },
+        {
+          "id": "tuile-foret",
+          "name": "Tuile forêt",
+          "shape": "square",
+          "size": 0.74,
+          "color": "#2e6b3f",
+          "art": "🌲",
+          "count": 6
+        },
+        {
+          "id": "tuile-eau",
+          "name": "Tuile eau",
+          "shape": "square",
+          "size": 0.74,
+          "color": "#2a6f97",
+          "art": "🌊",
+          "count": 6
+        },
+        {
+          "id": "mini",
+          "name": "Mini-carte",
+          "type": "Ressource",
+          "size": 0.6,
+          "color": "#7a5c9c",
+          "art": "💎",
+          "count": 6
+        },
+        {
+          "id": "evenement",
+          "name": "Événement",
+          "type": "Carte",
+          "color": "#b8322a",
+          "art": "⚡",
+          "text": "Une carte de taille standard.",
+          "count": 4
+        },
+        {
+          "id": "aide",
+          "name": "Aide de jeu",
+          "type": "Grande carte",
+          "size": 1.6,
+          "ratio": 0.7,
+          "color": "#4a5562",
+          "art": "📜",
+          "text": "Une grande carte, au format paysage.",
+          "count": 1
+        }
+      ]
+    }
+  },
+  "zones": [
+    {
+      "id": "plateau",
+      "name": "Plateau",
+      "layout": "free"
+    },
+    {
+      "id": "reserve",
+      "name": "Réserve",
+      "layout": "row"
+    },
+    {
+      "id": "main",
+      "name": "Main",
+      "owner": "player",
+      "visibility": "owner",
+      "layout": "row"
+    }
+  ],
+  "counters": [
+    {
+      "id": "points",
+      "name": "Points",
+      "scope": "player",
+      "initial": 0
+    }
+  ],
+  "ui": {
+    "hand": "main",
+    "play": "plateau"
+  },
+  "setup": [
+    {
+      "op": "spawn",
+      "deck": "plateau",
+      "to": "plateau"
+    },
+    {
+      "op": "spawn",
+      "deck": "materiel",
+      "to": "reserve"
+    }
+  ],
+  "macros": [
+    {
+      "id": "ranger",
+      "name": "Tout ranger dans la réserve",
+      "steps": [
+        {
+          "op": "gather",
+          "to": "reserve"
+        }
+      ]
+    }
+  ]
+}

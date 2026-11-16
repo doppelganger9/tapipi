@@ -1,0 +1,318 @@
+// The table: renders a player's view and turns gestures into engine actions.
+//
+// Rendering is a plain rebuild on every state update; cards are then animated
+// from where they were to where they are (FLIP), which is what makes a card
+// visibly travel from the draw pile to a hand.
+
+import { h, SEAT_COLORS, fill } from './dom.js';
+import { cardEl } from './cards.js';
+import { parseKey, zoneKey } from '/shared/zones.js';
+
+const DOUBLE_CLICK_MS = 350;
+
+export function createTable({ root, bar, menu, send, onHover }) {
+  let S = null; // { def, view, players, you }
+  let index = new Map(); // card id -> { card, key }
+  let drag = null;
+  let lastClick = { id: null, at: 0 };
+  const selection = new Set();
+  const expanded = new Set(); // stacks the viewer chose to spread out
+
+  const act = (action) => send({ t: 'act', a: action });
+  const playerName = (seat) => S.players.find((p) => p.seat === seat)?.name ?? `Joueur ${seat + 1}`;
+  const handKey = () => (S.you >= 0 && S.def.ui.hand ? `${S.def.ui.hand}@${S.you}` : null);
+
+  function zoneTitle(key) {
+    const { zone, seat } = parseKey(S.def, key);
+    return seat === null || seat === S.you ? zone.name : `${zone.name} · ${playerName(seat)}`;
+  }
+
+  function allZoneKeys() {
+    return S.def.zones.flatMap((zone) => (zone.owner === 'player' ? S.players.map((p) => zoneKey(zone, p.seat)) : [zone.id]));
+  }
+
+  // ---------------------------------------------------------------- render
+
+  function zoneEl(zone, seat) {
+    const key = zoneKey(zone, seat);
+    const cards = S.view.zones[key] ?? [];
+    for (const card of cards) index.set(card.id, { card, key });
+
+    const stacked = zone.layout === 'stack' && !expanded.has(key);
+    const layout = stacked ? 'stack' : zone.layout === 'free' ? 'free' : 'row';
+    const mine = zone.visibility === 'owner' && seat === S.you;
+
+    const body = h('div', { class: `zcards ${layout}` });
+    if (zone.image) body.style.backgroundImage = `url("${zone.image}")`;
+    if (zone.color) body.style.backgroundColor = zone.color;
+    if (zone.layout === 'stack' && !stacked) body.classList.add('wrap');
+    if (stacked) body.style.setProperty('--depth', Math.min(cards.length, 30));
+
+    if (layout === 'free') {
+      // Make room for the tallest component (a board can be many cards high).
+      const tallest = Math.max(0, ...cards.map((c) => { const p = S.def.protos[c.p]; return p ? (p.size ?? 1) * (p.ratio ?? (p.shape ? 1 : 1.4)) : 1.4; }));
+      if (tallest > 2.9) body.style.minHeight = `calc(var(--cw) * ${(tallest + 0.4).toFixed(2)})`;
+    }
+    for (const card of stacked ? cards.slice(-1) : cards) {
+      const el = cardEl(S.def, card);
+      if (card.p && !card.up && !mine) el.classList.add('peeked'); // only I can see this one
+      if (mine && card.up) el.classList.add('revealed'); // everyone can see this one
+      const angle = (card.rot ?? 0) + (card.tap ? 90 : 0);
+      if (angle) el.style.rotate = `${angle}deg`;
+      if (layout === 'free') {
+        el.style.setProperty('--x', card.x);
+        el.style.setProperty('--y', card.y);
+        body.append(el);
+      } else if (layout === 'row') {
+        const slot = h('div', { class: 'slot' }, el);
+        const size = S.def.protos[card.p]?.size;
+        if (size) slot.style.setProperty('--s', size); // small pieces take a small place in the row
+        body.append(slot);
+      } else body.append(el);
+    }
+    if (!cards.length && layout !== 'free') body.append(h('div', { class: 'empty' }));
+
+    return h('div', { class: `zone z-${layout}`, 'data-key': key },
+      h('div', { class: 'zhead' },
+        h('span', { class: 'zname' }, zone.name),
+        h('span', { class: 'zcount' }, String(cards.length)),
+        S.you >= 0 && h('button', { class: 'zmenu', title: 'Actions sur cette zone', 'aria-label': `Actions : ${zone.name}` }, '⋯')),
+      body);
+  }
+
+  function render() {
+    if (!S) return;
+    const before = new Map();
+    for (const el of root.querySelectorAll('.card')) before.set(el.dataset.id, el.getBoundingClientRect());
+    index = new Map();
+
+    const tableZones = S.def.zones.filter((z) => z.owner === 'table');
+    const playerZones = S.def.zones.filter((z) => z.owner === 'player');
+    // Opponents are laid out in turn order, starting from the player after me.
+    const others = S.players.filter((p) => p.seat !== S.you).sort((a, b) => ((a.seat - S.you + 99) % 99) - ((b.seat - S.you + 99) % 99));
+
+    fill(root, 
+      h('div', { class: 'opponents' }, others.map((p) => h('div', { class: `area ${p.connected ? '' : 'away'}`, 'data-seat': p.seat, style: `--seat:${SEAT_COLORS[p.seat]}` },
+        h('div', { class: 'area-name' }, p.name, S.view.turn === p.seat && ' ●', !p.connected && ' (absent·e)'),
+        h('div', { class: 'zones' }, playerZones.map((z) => zoneEl(z, p.seat)))))),
+      h('div', { class: 'center zones' }, tableZones.map((z) => zoneEl(z, null))),
+      S.you >= 0
+        ? h('div', { class: 'area mine', 'data-seat': S.you, style: `--seat:${SEAT_COLORS[S.you]}` }, h('div', { class: 'zones' }, playerZones.map((z) => zoneEl(z, S.you))))
+        : h('div', { class: 'spectator' }, 'Vous regardez la partie en spectateur : toutes les places sont prises.'),
+      (S.view.stains ?? []).map((s) => h('div', { class: 'stain', style: `left:${10 + s.x * 80}%;top:${15 + s.y * 60}%;rotate:${s.r}deg` })),
+    );
+
+    for (const id of [...selection]) if (!index.has(id)) selection.delete(id);
+    syncSelection();
+
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!before.size || reduced) return;
+    for (const el of root.querySelectorAll('.card')) {
+      const old = before.get(el.dataset.id);
+      if (!old) {
+        el.animate([{ opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1 }], { duration: 180 });
+        continue;
+      }
+      const now = el.getBoundingClientRect();
+      const dx = old.left - now.left;
+      const dy = old.top - now.top;
+      if (Math.abs(dx) + Math.abs(dy) > 2) {
+        el.animate([{ translate: `${dx}px ${dy}px`, zIndex: 50 }, { translate: '0 0', zIndex: 50 }], { duration: 260, easing: 'cubic-bezier(.2,.8,.3,1)' });
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------- selection
+
+  function syncSelection() {
+    for (const el of root.querySelectorAll('.card')) {
+      el.classList.toggle('selected', selection.has(el.dataset.id));
+      el.classList.toggle('dragging', Boolean(drag?.ids?.includes(el.dataset.id)));
+    }
+    const ids = [...selection];
+    bar.hidden = !ids.length;
+    if (!ids.length) return;
+    const button = (label, title, action) => h('button', { title, onclick: () => act({ ...action, cards: [...selection] }) }, label);
+    fill(bar, 
+      h('span', { class: 'count' }, `${ids.length} sélectionnée${ids.length > 1 ? 's' : ''}`),
+      button('Retourner', 'Face visible / face cachée', { type: 'flip' }),
+      button('Incliner', 'Pivoter de 90°', { type: 'tap' }),
+      button('Regarder', 'Regarder en secret (les autres en sont informés)', { type: 'peek' }),
+      button('+ jeton', 'Ajouter un jeton', { type: 'token', delta: 1 }),
+      button('− jeton', 'Retirer un jeton', { type: 'token', delta: -1 }),
+      h('select', { 'aria-label': 'Envoyer vers', onchange: (e) => { act({ type: 'move', cards: [...selection], to: e.target.value }); clearSelection(); } },
+        h('option', { value: '', disabled: true, selected: true }, 'Envoyer vers…'),
+        allZoneKeys().map((key) => h('option', { value: key }, zoneTitle(key)))),
+      h('button', { class: 'ghost-btn', title: 'Désélectionner', onclick: clearSelection }, '✕'),
+    );
+    const last = index.get(ids.at(-1))?.card;
+    if (last?.p) onHover(last);
+  }
+
+  function clearSelection() {
+    selection.clear();
+    syncSelection();
+  }
+
+  // ---------------------------------------------------------------- zone menu
+
+  function openMenu(button, key) {
+    const { zone } = parseKey(S.def, key);
+    const ids = (S.view.zones[key] ?? []).filter((c) => !S.def.protos[c.p]?.fixed).map((c) => c.id);
+    const hand = handKey();
+    const ask = (question, then) => {
+      const n = parseInt(prompt(question, '1'), 10);
+      if (n > 0) then(n);
+    };
+    const show = (items) => {
+      fill(menu, ...items.filter(Boolean).map(([label, run, keepOpen]) => h('button', { onclick: () => { if (!keepOpen) menu.hidden = true; run(); } }, label)));
+      menu.hidden = false;
+      const rect = button.getBoundingClientRect();
+      menu.style.left = `${Math.min(rect.left, innerWidth - menu.offsetWidth - 8)}px`;
+      menu.style.top = `${Math.min(rect.bottom + 4, innerHeight - menu.offsetHeight - 8)}px`;
+    };
+    show([
+      hand && key !== hand && ['Piocher 1 carte', () => act({ type: 'take', from: key, to: hand, count: 1 })],
+      hand && key !== hand && ['Piocher…', () => ask('Combien de cartes piocher ?', (n) => act({ type: 'take', from: key, to: hand, count: n }))],
+      S.def.ui.hand && ['Distribuer à chacun…', () => ask('Combien de cartes par joueur ?', (n) => act({ type: 'deal', from: key, to: S.def.ui.hand, count: n }))],
+      ['Mélanger', () => act({ type: 'shuffle', zone: key })],
+      zone.layout === 'stack' && [expanded.has(key) ? 'Empiler' : 'Étaler pour fouiller', () => { expanded.has(key) ? expanded.delete(key) : expanded.add(key); render(); }],
+      ids.length && ['Regarder tout en secret', () => act({ type: 'peek', cards: ids })],
+      ids.length && ['Tout mettre face visible', () => act({ type: 'flip', cards: ids, faceUp: true })],
+      ids.length && ['Tout mettre face cachée', () => act({ type: 'flip', cards: ids, faceUp: false })],
+      zone.layout === 'free' && ['Balayer d’un revers de main', () => act({ type: 'sweep', zone: key })],
+      ids.length && ['Tout déplacer vers… ›', () => show(allZoneKeys().filter((k) => k !== key).map((k) => [zoneTitle(k), () => act({ type: 'move', cards: ids, to: k })])), true],
+    ]);
+  }
+
+  // ---------------------------------------------------------------- gestures
+
+  function doubleClick(id) {
+    const entry = index.get(id);
+    if (!entry) return;
+    const { zone } = parseKey(S.def, entry.key);
+    const hand = handKey();
+    selection.clear();
+    if (zone.layout === 'stack' && !expanded.has(entry.key) && hand && entry.key !== hand) {
+      act({ type: 'take', from: entry.key, to: hand, count: 1 }); // draw
+    } else if (entry.key === hand && S.def.ui.play) {
+      const play = S.def.zones.find((z) => z.id === S.def.ui.play);
+      act({ type: 'move', cards: [id], to: zoneKey(play, S.you) }); // play
+    } else act({ type: 'tap', cards: [id] });
+    syncSelection();
+  }
+
+  function click(d) {
+    const now = performance.now();
+    if (lastClick.id === d.id && now - lastClick.at < DOUBLE_CLICK_MS) {
+      lastClick = { id: null, at: 0 };
+      return doubleClick(d.id);
+    }
+    lastClick = { id: d.id, at: now };
+    if (d.additive) selection.has(d.id) ? selection.delete(d.id) : selection.add(d.id);
+    else {
+      const wasOnly = selection.size === 1 && selection.has(d.id);
+      selection.clear();
+      if (!wasOnly) selection.add(d.id);
+    }
+    syncSelection();
+  }
+
+  function beginDrag(d, source) {
+    d.ids = selection.has(d.id) ? [...selection] : [d.id];
+    d.ghost = source.cloneNode(true);
+    d.ghost.classList.add('ghost');
+    d.ghost.classList.remove('selected');
+    Object.assign(d.ghost.style, { width: `${source.offsetWidth}px`, height: `${source.offsetHeight}px`, fontSize: getComputedStyle(source).fontSize });
+    if (d.ids.length > 1) d.ghost.append(h('span', { class: 'badge' }, String(d.ids.length)));
+    document.body.append(d.ghost);
+    syncSelection();
+  }
+
+  function dropZoneAt(x, y) {
+    return document.elementFromPoint(x, y)?.closest('.zone') ?? null;
+  }
+
+  function drop(d, event) {
+    d.ghost.remove();
+    const target = dropZoneAt(event.clientX, event.clientY);
+    root.querySelector('.zone.over')?.classList.remove('over');
+    syncSelection();
+    if (!target) return;
+    const action = { type: 'move', cards: d.ids, to: target.dataset.key };
+    const body = target.querySelector('.zcards');
+    const rect = body.getBoundingClientRect();
+    if (body.classList.contains('free')) {
+      action.x = (event.clientX - d.offsetX - rect.left) / Math.max(1, rect.width - d.width);
+      action.y = (event.clientY - d.offsetY - rect.top) / Math.max(1, rect.height - d.height);
+    } else if (body.classList.contains('row')) {
+      // Insert where the card was dropped, so a hand can be sorted by dragging.
+      action.index = [...body.querySelectorAll('.card')].filter((el) => {
+        const r = el.getBoundingClientRect();
+        return !d.ids.includes(el.dataset.id) && r.left + r.width / 2 < event.clientX;
+      }).length;
+    }
+    act(action);
+    selection.clear();
+  }
+
+  root.addEventListener('pointerdown', (event) => {
+    if (event.button || !S) return;
+    const menuButton = event.target.closest('.zmenu');
+    if (menuButton) return openMenu(menuButton, menuButton.closest('.zone').dataset.key);
+    const el = event.target.closest('.card');
+    if (!el) return clearSelection();
+    if (S.you < 0) return;
+    event.preventDefault();
+    const rect = el.getBoundingClientRect();
+    drag = {
+      id: el.dataset.id, source: el, startX: event.clientX, startY: event.clientY,
+      offsetX: event.clientX - rect.left, offsetY: event.clientY - rect.top, width: el.offsetWidth, height: el.offsetHeight,
+      additive: event.ctrlKey || event.metaKey || event.shiftKey, ghost: null, ids: null,
+    };
+  });
+
+  addEventListener('pointermove', (event) => {
+    if (!drag) return;
+    if (!drag.ghost) {
+      if (Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY) < 6) return;
+      beginDrag(drag, drag.source);
+    }
+    drag.ghost.style.left = `${event.clientX - drag.offsetX}px`;
+    drag.ghost.style.top = `${event.clientY - drag.offsetY}px`;
+    const over = dropZoneAt(event.clientX, event.clientY);
+    for (const zone of root.querySelectorAll('.zone.over')) if (zone !== over) zone.classList.remove('over');
+    over?.classList.add('over');
+  });
+
+  addEventListener('pointerup', (event) => {
+    if (!drag) return;
+    const d = drag;
+    drag = null;
+    if (d.ghost) drop(d, event);
+    else click(d);
+  });
+
+  addEventListener('pointercancel', () => {
+    drag?.ghost?.remove();
+    drag = null;
+    if (S) syncSelection();
+  });
+
+  addEventListener('pointerdown', (event) => {
+    if (!menu.hidden && !menu.contains(event.target) && !event.target.closest('.zmenu')) menu.hidden = true;
+  });
+
+  root.addEventListener('pointerover', (event) => {
+    const id = event.target.closest('.card')?.dataset.id;
+    const card = id && index.get(id)?.card;
+    if (card?.p) onHover(card);
+  });
+
+  return {
+    update(state) {
+      S = state;
+      render();
+    },
+  };
+}

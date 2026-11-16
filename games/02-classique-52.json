@@ -1,0 +1,139 @@
+{
+  "format": "tapis/1",
+  "id": "classique-52",
+  "name": "Jeu de 52 cartes",
+  "description": "Table libre avec un jeu traditionnel de 52 cartes et 2 jokers. Pour le rami, le président, le poker, le huit américain… à vous d'appliquer les règles.",
+  "author": "Tapis",
+  "license": "CC0-1.0",
+  "players": {
+    "min": 1,
+    "max": 8
+  },
+  "rules": "Table libre : aucune règle n'est imposée, comme autour d'une vraie table.\n\n• Double-clic sur la pioche : piocher une carte.\n• Glisser-déposer : déplacer une carte vers n'importe quelle zone.\n• Double-clic sur une carte de votre main : la jouer sur le tapis.\n• Menu ⋯ d'une zone : mélanger, distribuer, étaler, regarder.\n• « Actions de table » (à droite) : distributions toutes faites.\n\nTout ce que font les joueurs est annoncé dans le journal.",
+  "decks": {
+    "main": {
+      "preset": "standard52",
+      "jokers": 2,
+      "back": {
+        "color": "#7a1f2b",
+        "label": "❖"
+      }
+    }
+  },
+  "zones": [
+    {
+      "id": "pioche",
+      "name": "Pioche",
+      "visibility": "hidden",
+      "layout": "stack"
+    },
+    {
+      "id": "defausse",
+      "name": "Défausse",
+      "visibility": "public",
+      "layout": "stack"
+    },
+    {
+      "id": "tapis",
+      "name": "Tapis",
+      "visibility": "public",
+      "layout": "free"
+    },
+    {
+      "id": "main",
+      "name": "Main",
+      "owner": "player",
+      "visibility": "owner",
+      "layout": "row"
+    },
+    {
+      "id": "plis",
+      "name": "Plis",
+      "owner": "player",
+      "visibility": "hidden",
+      "layout": "stack"
+    }
+  ],
+  "counters": [
+    {
+      "id": "score",
+      "name": "Score",
+      "scope": "player",
+      "initial": 0
+    }
+  ],
+  "ui": {
+    "hand": "main",
+    "draw": "pioche",
+    "play": "tapis"
+  },
+  "setup": [
+    {
+      "op": "spawn",
+      "deck": "main",
+      "to": "pioche"
+    },
+    {
+      "op": "shuffle",
+      "zone": "pioche"
+    }
+  ],
+  "macros": [
+    {
+      "id": "ramasser",
+      "name": "Tout ramasser et mélanger",
+      "steps": [
+        {
+          "op": "gather",
+          "to": "pioche"
+        },
+        {
+          "op": "shuffle",
+          "zone": "pioche"
+        }
+      ]
+    },
+    {
+      "id": "donne5",
+      "name": "Distribuer 5 cartes à chacun",
+      "steps": [
+        {
+          "op": "deal",
+          "from": "pioche",
+          "to": "main",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "id": "donne7",
+      "name": "Distribuer 7 cartes à chacun",
+      "steps": [
+        {
+          "op": "deal",
+          "from": "pioche",
+          "to": "main",
+          "count": 7
+        }
+      ]
+    },
+    {
+      "id": "donneTout",
+      "name": "Distribuer tout le paquet",
+      "steps": [
+        {
+          "op": "deal",
+          "from": "pioche",
+          "to": "main",
+          "count": "all"
+        }
+      ]
+    }
+  ],
+  "quickstart": [
+    "Lancez une action de table pour distribuer (à droite).",
+    "Double-clic sur la pioche : piocher. Double-clic sur une carte de votre main : la jouer.",
+    "Glissez les cartes où vous voulez ; le menu ⋯ d'une zone mélange, étale ou distribue.",
+    "Aucune règle n'est imposée : jouez à ce que vous voulez."
+  ]
+}

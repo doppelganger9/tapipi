@@ -1,0 +1,113 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync, readdirSync } from 'node:fs';
+import { DefinitionError, normalizeDefinition } from '../shared/definition.js';
+import { applyAction, createGame, setup } from '../shared/engine.js';
+import { viewFor } from '../shared/view.js';
+
+const load = (file) => normalizeDefinition(JSON.parse(readFileSync(new URL(`../games/${file}`, import.meta.url), 'utf8')));
+
+function newGame(file = '01-chaudrons-et-chardons.json', seats = [0, 1], seed = 42) {
+  const state = createGame(load(file), seed);
+  state.activeSeats = seats;
+  state.seatNames = seats.map((s) => `P${s}`);
+  setup(state);
+  return state;
+}
+
+const total = (state) => Object.values(state.zones).reduce((n, ids) => n + ids.length, 0);
+
+test('every bundled game is valid', () => {
+  for (const file of readdirSync(new URL('../games/', import.meta.url))) assert.ok(load(file).name);
+});
+
+test('setup deals to seated players only and conserves cards', () => {
+  const state = newGame();
+  assert.equal(state.zones['main@0'].length, 5);
+  assert.equal(state.zones['main@1'].length, 5);
+  assert.equal(state.zones['main@2'].length, 0);
+  assert.equal(total(state), 56);
+  assert.equal(Object.keys(state.cards).length, 56);
+});
+
+test('same seed, same game', () => {
+  const protos = (s) => s.zones.pioche.map((id) => s.cards[id].proto);
+  assert.deepEqual(protos(newGame(undefined, [0, 1], 7)), protos(newGame(undefined, [0, 1], 7)));
+  assert.notDeepEqual(protos(newGame(undefined, [0, 1], 7)), protos(newGame(undefined, [0, 1], 8)));
+});
+
+test('views hide what a player may not see', () => {
+  const state = newGame();
+  const mine = viewFor(state, 0);
+  assert.ok(mine.zones['main@0'].every((c) => c.p));
+  assert.ok(mine.zones['main@1'].every((c) => !c.p && c.d === 'grimoire'));
+  assert.ok(mine.zones.pioche.every((c) => !c.p));
+  assert.ok(viewFor(state, -1).zones['main@0'].every((c) => !c.p), 'spectators see no hand');
+  assert.ok(!JSON.stringify(mine.zones['main@1']).includes('amanite'));
+});
+
+test('playing a card reveals it; the log never names a hidden card', () => {
+  const state = newGame();
+  const [id] = state.zones['main@0'];
+  assert.deepEqual(applyAction(state, 0, { type: 'move', cards: [id], to: 'chaudron@0' }), { ok: true });
+  assert.ok(viewFor(state, 1).zones['chaudron@0'][0].p);
+  assert.match(state.events.pop().text, /«/);
+
+  applyAction(state, 0, { type: 'take', from: 'pioche', to: 'main@0', count: 2 });
+  assert.equal(state.zones['main@0'].length, 6);
+  assert.doesNotMatch(state.events.pop().text, /«/);
+});
+
+test('shuffling renames cards so they cannot be tracked', () => {
+  const state = newGame();
+  const before = new Set(state.zones.pioche);
+  applyAction(state, 0, { type: 'shuffle', zone: 'pioche' });
+  assert.ok(state.zones.pioche.every((id) => !before.has(id)));
+  assert.equal(total(state), 56);
+});
+
+test('peeking is private and announced', () => {
+  const state = newGame();
+  const top = state.zones.pioche.at(-1);
+  applyAction(state, 1, { type: 'peek', cards: [top] });
+  assert.ok(viewFor(state, 1).zones.pioche.at(-1).p);
+  assert.ok(!viewFor(state, 0).zones.pioche.at(-1).p);
+  assert.match(state.events.pop().text, /regarde 1 carte en secret/);
+});
+
+test('invalid actions are refused without side effects', () => {
+  const state = newGame();
+  const snapshot = JSON.stringify(state.zones);
+  for (const action of [
+    null, { type: 'constructor' }, { type: 'move', cards: ['nope'], to: 'pioche' },
+    { type: 'move', cards: [state.zones.pioche[0]], to: 'main@9' }, { type: 'move', cards: [state.zones.pioche[0]], to: '__proto__' },
+    { type: 'take', from: 'pioche', to: 'main@0', count: -1 }, { type: 'counter', id: 'potions', seat: 4, delta: 1 },
+  ]) assert.ok(applyAction(state, 0, action).error, JSON.stringify(action));
+  assert.equal(JSON.stringify(state.zones), snapshot);
+});
+
+test('macros, counters and turns', () => {
+  const state = newGame('02-classique-52.json', [0, 2]);
+  applyAction(state, 0, { type: 'macro', id: 'donneTout' });
+  assert.equal(state.zones['main@0'].length, 27);
+  assert.equal(state.zones['main@2'].length, 27);
+  applyAction(state, 0, { type: 'macro', id: 'ramasser' });
+  assert.equal(state.zones.pioche.length, 54);
+  applyAction(state, 0, { type: 'counter', id: 'score', seat: 2, delta: 3 });
+  assert.equal(state.counters.players[2].score, 3);
+  applyAction(state, 0, { type: 'turn' });
+  assert.equal(state.turn, 2);
+});
+
+test('definitions are validated and stripped', () => {
+  const base = JSON.parse(readFileSync(new URL('../games/02-classique-52.json', import.meta.url), 'utf8'));
+  const bad = (patch, pattern) => assert.throws(() => normalizeDefinition({ ...structuredClone(base), ...patch }), (e) => e instanceof DefinitionError && pattern.test(e.message));
+  bad({ format: 'x' }, /format/);
+  bad({ zones: [] }, /zone/);
+  bad({ setup: [{ op: 'shuffle', zone: 'nowhere' }] }, /zone inconnue/);
+  bad({ decks: { a: { cards: [{ name: 'X', image: 'javascript:alert(1)' }] } } }, /image/);
+  bad({ decks: { a: { cards: [{ name: 'X', color: 'red;background:url(x)' }] } } }, /color/);
+  const def = normalizeDefinition({ ...base, evil: '<script>', zones: base.zones.map((z) => ({ ...z, onclick: 'x' })) });
+  assert.equal(def.evil, undefined);
+  assert.equal(def.zones[0].onclick, undefined);
+});
