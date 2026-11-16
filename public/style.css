@@ -291,3 +291,20 @@ button.pack:hover:not(:disabled), button.sheet:hover:not(:disabled) { border: 0;
   .hero h1 { font-size: 2.4rem; }
 }
 @media (prefers-reduced-motion: reduce) { .card { transition: none; } .stain, .coach-target, .gamebox { animation: none; } }
+
+/* A game that lives: what players wrote, scribbled, tore and stuck on a card. */
+.marks { position: absolute; inset: 0; pointer-events: none; border-radius: inherit; overflow: hidden; z-index: 1; }
+.marks .note { position: absolute; left: -10%; right: -10%; top: 38%; rotate: -14deg; text-align: center; font: italic 700 calc(var(--cw) * .13) / 1.1 "Comic Sans MS", "Bradley Hand", cursive; color: #1740c9; text-shadow: 0 0 2px #fff, 0 0 2px #fff; overflow-wrap: anywhere; padding: 0 14%; }
+.marks .scribble { position: absolute; inset: 8%; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 140' preserveAspectRatio='none'%3E%3Cpath d='M5 20 Q30 5 50 30 T95 25 M8 60 Q40 30 60 70 T92 55 M10 110 Q35 80 55 115 T90 95 M15 15 L85 125 M85 18 L18 122' fill='none' stroke='%23222' stroke-width='3' stroke-linecap='round' opacity='.75'/%3E%3C/svg%3E") center / 100% 100% no-repeat; }
+.marks .stickers { position: absolute; left: 4%; bottom: 4%; right: 4%; display: flex; flex-wrap: wrap-reverse; gap: 1px; font-size: calc(var(--cw) * .2); line-height: 1; }
+.marks .stickers i { font-style: normal; filter: drop-shadow(0 1px 1px rgb(0 0 0 / .5)); rotate: -8deg; }
+.marks .stickers i:nth-child(even) { rotate: 11deg; }
+.card.torn { clip-path: polygon(0 0, 100% 0, 100% 62%, 88% 70%, 80% 64%, 70% 76%, 60% 70%, 50% 84%, 40% 78%, 28% 92%, 18% 88%, 8% 100%, 0 100%); }
+.spy { padding: 0 4px; line-height: 1.2; background: transparent; border-color: transparent; opacity: .45; filter: grayscale(1); }
+.spy:hover, .spy:focus-visible { opacity: 1; filter: none; }
+.zhead .spy + .zmenu { margin-left: 0; }
+.zhead .spy { margin-left: auto; }
+.log p.whisper { color: #9be3ff; font-style: italic; }
+.caught { position: fixed; z-index: 160; translate: -50% -50%; padding: 8px 16px; border-radius: 12px; background: #c62828; color: #fff; font: 800 1.3rem system-ui; pointer-events: none; animation: caught 1.8s ease-out both; }
+@keyframes caught { 0% { scale: .2; opacity: 0; } 15% { scale: 1.25; opacity: 1; } 30% { scale: 1; } 85% { opacity: 1; } 100% { opacity: 0; } }
+.form-dlg textarea { width: 100%; font: inherit; }

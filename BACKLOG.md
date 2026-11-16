@@ -121,3 +121,25 @@ Objectif : retrouver ses jeux et ses tables d'un appareil à l'autre.
 - Limites par IP (création de tables), journalisation, supervision.
 - Accessibilité : jouer au clavier (le glisser-déposer n'a pas d'équivalent clavier complet).
 - Traductions (toute l'interface est en français, textes en dur).
+
+## Lot 8 — Tricher, et un jeu qui évolue (« legacy »)
+
+Fait : lorgner la main d'un adversaire (👀, une carte de plus par essai, risque croissant d'être pris, `cheating: false` pour l'interdire) ;
+marquer une carte face visible (mot, gribouillis, déchirure, autocollants) ; ajouter une carte en cours de partie ;
+« Sauvegarder la boîte » (fichier `tapis/1` rouvrable, boîte déjà déballée).
+
+Majeur
+- Sauvegarde côté serveur d'une « boîte » par groupe (campagne legacy) : dépend du lot 4 (comptes, stockage). C'est le premier usage payant crédible.
+- Contenu scellé à débloquer : enveloppes / paquets fermés ouverts par un script ou une condition (« ouvrez l'enveloppe 3 après la partie 5 »).
+- Détruire une carte pour de bon (retirée des parties suivantes), modifier son texte, marquer une seule copie d'une carte en plusieurs exemplaires.
+- Journal de campagne : parties jouées, scores, qui a fait quoi au jeu.
+
+Mineur
+- Triche : contre-mesures (« cacher son jeu », accuser un joueur à tort ou à raison), marquer le *dos* d'une carte (visible même cachée), carte dans la manche.
+- Triche : variante « reflet » (aperçu flou et bref au lieu d'une carte nette), réglage du risque par la table.
+- Dessin libre au doigt sur une carte ; autocollants fournis par le fichier de jeu.
+
+## Pistes commerciales (à valider avant de coder)
+
+- « Essayer avant d'acheter » : nécessite un accord écrit de chaque éditeur (licence de démonstration) ; à traiter comme une offre B2B, pas comme une fonction.
+- Affiliation boutique : lien de suivi + code de réduction ; vérifier marges, TVA, droit de rétractation sur contenu numérique.

@@ -32,6 +32,11 @@ const table = createTable({
   send: (message) => connection.send(message),
   onHover: (card) => fill($('preview'), cardEl(S.def, { p: card.p, up: true }, { detailed: true })),
   onDeal: openDeal,
+  onNote: (done) => {
+    $('noteForm').reset();
+    $('noteDlg').onclose = () => { if ($('noteDlg').returnValue === 'ok') done($('noteForm').elements.note.value); };
+    $('noteDlg').showModal();
+  },
 });
 
 const coach = createCoach({ el: $('coach'), onFinish: () => store.set('tapis:coached', '1') });
@@ -63,6 +68,7 @@ function receive(message) {
     }
     case 'state':
       Object.assign(S, { view: message.view, players: message.players, you: message.you, host: message.host });
+      applyLegacy(message.view.legacy);
       document.body.classList.toggle('is-host', S.you >= 0 && S.you === S.host);
       table.update(S, queuedFx);
       queuedFx = null;
@@ -84,10 +90,30 @@ function receive(message) {
       if (message.fx?.kind === 'shuffle' || message.fx?.kind === 'unbox') queuedFx = message.fx;
       else if (message.fx) playEffect(message.fx);
       break;
+    case 'saved': {
+      // The game as it lives on this table, as a file to reopen another day.
+      const url = URL.createObjectURL(new Blob([JSON.stringify(message.def, null, 1)], { type: 'application/json' }));
+      h('a', { href: url, download: `${message.def.id}-${new Date().toISOString().slice(0, 10)}.json` }).click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      break;
+    }
     case 'error':
       toast(message.text);
       if (message.lobby) leave();
       break;
+  }
+}
+
+/** Cards written or altered during play are part of the game from then on. */
+function applyLegacy(legacy) {
+  if (!legacy || !S.def) return;
+  for (const [key, proto] of Object.entries(legacy.added)) {
+    if (!S.def.protos[key]) S.def.decks[proto.deck]?.list.push(key);
+    S.def.protos[key] = proto;
+  }
+  for (const [key, proto] of Object.entries(S.def.protos)) {
+    if (legacy.marks[key]) proto.marks = legacy.marks[key];
+    else delete proto.marks;
   }
 }
 
@@ -281,11 +307,32 @@ function renderSidebar() {
     [...new Set(S.def.macros.map(groupOf))].map((group) => [group, S.def.macros.filter((m) => groupOf(m) === group)]).map(([group, macros]) => h('div', { class: 'group' },
       h('span', { class: 'label' }, group),
       macros.map((m) => h('button', { title: m.on ? 'Se lance aussi tout seul au début de chaque tour' : '', onclick: () => runMacro(m) }, m.name, m.on && ' ⟳')))),
+    h('div', { class: 'group' }, h('span', { class: 'label' }, 'Le jeu évolue'),
+      h('button', { title: 'Écrire une carte qui restera dans le jeu', onclick: openAddCard }, 'Ajouter une carte…'),
+      h('button', { title: 'Télécharger le jeu tel qu’il est devenu (cartes marquées et ajoutées), pour le rouvrir plus tard', onclick: () => connection.send({ t: 'save' }) }, 'Sauvegarder la boîte')),
     h('div', { class: 'group' }, h('span', { class: 'label' }, 'Mauvais joueur'),
       button('Renverser la table', { type: 'flipTable' }),
       button('Renverser son café', { type: 'spill' }),
       (S.view.stains ?? []).length > 0 && button('Éponger', { type: 'clean' })),
   );
+}
+
+/** A new card, written by hand, that joins the game for good. */
+function openAddCard() {
+  const form = $('cardForm');
+  form.reset();
+  fill(form.elements.deck, Object.entries(S.def.decks).map(([id, deck]) => h('option', { value: id }, deck.name)));
+  const hand = S.def.ui.hand && `${S.def.ui.hand}@${S.you}`;
+  fill(form.elements.to, S.def.zones.flatMap((zone) => {
+    const key = zone.owner === 'player' ? `${zone.id}@${S.you}` : zone.id;
+    return h('option', { value: key, selected: key === hand }, zone.name);
+  }));
+  $('cardDlg').onclose = () => {
+    if ($('cardDlg').returnValue !== 'ok') return;
+    const { name, type, art, text, deck, to } = form.elements;
+    act({ type: 'addCard', deck: deck.value, to: to.value, card: { name: name.value, type: type.value, art: art.value, text: text.value } });
+  };
+  $('cardDlg').showModal();
 }
 
 /** A script with parameters asks for them first. */
@@ -350,6 +397,17 @@ function playEffect(fx) {
       { transform: 'perspective(1200px) rotateX(70deg) translateY(-18%) scale(.85)', offset: 0.35 },
       { transform: 'perspective(1200px) rotateX(360deg) translateY(0)' },
     ], { duration: 900, easing: 'cubic-bezier(.3,.1,.3,1.2)' });
+  }
+  if (fx.kind === 'caught') {
+    // Everybody turns to the cheat.
+    const area = document.querySelector(`.area[data-seat="${fx.from}"]`) ?? $('table');
+    const rect = area.getBoundingClientRect();
+    const flag = h('div', { class: 'caught' }, '🫵 Tricheur !');
+    flag.style.left = `${rect.left + rect.width / 2}px`;
+    flag.style.top = `${rect.top + rect.height / 2}px`;
+    document.body.append(flag);
+    area.animate([{ translate: '-6px 0' }, { translate: '6px 0' }, { translate: '-4px 0' }, { translate: '0 0' }], { duration: 350 });
+    setTimeout(() => flag.remove(), 1800);
   }
   if (fx.kind === 'throw') {
     const center = (seat) => {

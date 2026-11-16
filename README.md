@@ -128,3 +128,10 @@ Tapis ne distribue que des jeux traditionnels (domaine public) et des jeux origi
 à partir de texte et d'emoji. Les fichiers chargés par les joueurs ne sont ni stockés ni
 publiés : ils vivent en mémoire le temps de la table. Code sous licence MIT ; « Chaudrons &
 Chardons » sous CC BY 4.0.
+
+## Tricher, et faire vivre le jeu
+
+- **Lorgner** : le bouton 👀 sur la main d'un autre joueur montre une carte de plus à chaque essai, à vous seul — ou vous fait prendre devant toute la table (25 % au premier essai, +15 % par carte déjà vue). `"cheating": false` dans le fichier de jeu l'interdit.
+- **Marquer** : une carte face visible peut recevoir un mot, un gribouillis, une déchirure, des autocollants (menu « Marquer… » de la sélection). La marque appartient à la carte : elle revient aux parties suivantes.
+- **Ajouter une carte** : « Ajouter une carte… » écrit une nouvelle carte (texte et émoji) qui rejoint le paquet pour de bon.
+- **Sauvegarder la boîte** : télécharge le jeu tel qu'il est devenu, au format `tapis/1` ; on le rouvre avec « Charger un fichier de jeu ». Rien n'est stocké sur le serveur.

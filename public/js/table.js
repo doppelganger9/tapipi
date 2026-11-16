@@ -12,7 +12,9 @@ import { parseKey, zoneKey } from '/shared/zones.js';
 const DOUBLE_CLICK_MS = 350;
 const DRAG_THRESHOLD = 6;
 
-export function createTable({ root, bar, menu, send, onHover, onDeal }) {
+const STICKERS = ['⭐', '❤️', '💀', '🔥', '👑', '🩹', '❌', '✅'];
+
+export function createTable({ root, bar, menu, send, onHover, onDeal, onNote }) {
   let S = null; // { def, view, players, you }
   let index = new Map(); // card id -> { card, key }
   let piles = new Map(); // id of a pile's top card -> ids of the whole pile, bottom first
@@ -101,6 +103,9 @@ export function createTable({ root, bar, menu, send, onHover, onDeal }) {
       h('div', { class: 'zhead' },
         h('span', { class: 'zname' }, zone.name),
         h('span', { class: 'zcount' }, String(cards.length)),
+        // Somebody else's hand: one may always try a glance…
+        S.you >= 0 && S.def.cheating && zone.visibility === 'owner' && seat !== S.you && cards.some((c) => !c.up && !c.p)
+          && h('button', { class: 'spy', title: 'Lorgner ce jeu : une carte de plus à chaque essai… ou vous vous faites prendre', 'aria-label': `Lorgner : ${zone.name}`, onclick: () => act({ type: 'spy', zone: key }) }, '👀'),
         S.you >= 0 && h('button', { class: 'zmenu', title: 'Actions sur cette zone', 'aria-label': `Actions : ${zone.name}` }, '⋯')),
       body);
   }
@@ -216,6 +221,20 @@ export function createTable({ root, bar, menu, send, onHover, onDeal }) {
       h('select', { 'aria-label': 'Envoyer vers', onchange: (e) => { act({ type: 'move', cards: [...selection], to: e.target.value, stack: true }); clearSelection(); } },
         h('option', { value: '', disabled: true, selected: true }, 'Envoyer vers…'),
         allZoneKeys().map((key) => h('option', { value: key }, zoneTitle(key)))),
+      // Lasting changes: they stay on the card from one game to the next.
+      h('select', { 'aria-label': 'Marquer la carte', title: 'Modifier la carte pour de bon (face visible uniquement)', onchange: (e) => {
+        const [kind, value] = e.target.value.split(':');
+        const cards = [...selection];
+        e.target.selectedIndex = 0;
+        if (kind === 'note') onNote((note) => act({ type: 'mark', cards, note }));
+        else act({ type: 'mark', cards, [kind]: value ?? true });
+      } },
+        h('option', { value: '', disabled: true, selected: true }, 'Marquer…'),
+        h('option', { value: 'note' }, '✏️ Écrire dessus…'),
+        h('option', { value: 'scribble' }, '〰️ Griffonner / effacer le gribouillis'),
+        h('option', { value: 'torn' }, '✂️ Déchirer'),
+        STICKERS.map((s) => h('option', { value: `sticker:${s}` }, `Coller ${s}`)),
+        h('option', { value: 'erase' }, '✨ Remettre à neuf')),
       h('button', { class: 'ghost-btn', title: 'Désélectionner', onclick: clearSelection }, '✕'),
     );
     const last = index.get(ids.at(-1))?.card;

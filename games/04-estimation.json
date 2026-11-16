@@ -1,6 +1,7 @@
 {
   "format": "tapis/1",
   "id": "estimation-equipe",
+  "cheating": false,
   "name": "Estimation d'équipe",
   "description": "Pour chiffrer des tâches entre collègues : chacun pose une carte face cachée, puis on révèle tout en même temps.",
   "author": "Tapis",

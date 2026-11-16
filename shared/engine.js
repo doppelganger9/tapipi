@@ -10,9 +10,12 @@
 
 import { shuffleInPlace, randomInt, nextRandom } from './rng.js';
 import { findZone, keysFor, parseKey } from './zones.js';
+import { DefinitionError, normalizeMarks, normalizeNewCard } from './definition.js';
 
 const MAX_CARDS = 3000;
 const MAX_SELECTION = 300;
+const MAX_ADDED = 200;
+const STICKERS = ['⭐', '❤️', '💀', '🔥', '👑', '🩹', '❌', '✅'];
 
 class ActionError extends Error {}
 
@@ -22,8 +25,15 @@ function refuse(message) {
 
 // ---------------------------------------------------------------- state
 
+/**
+ * `def` belongs to the game from now on: altering or adding cards during play
+ * changes it, so callers sharing a definition between tables must pass a copy.
+ */
 export function createGame(def, seed = Date.now()) {
   const state = clearTable({ def, rng: seed >>> 0, activeSeats: [], seatNames: [], events: [] });
+  // What play has changed in the game itself; it survives "new game".
+  state.legacy = { marks: {}, added: {} };
+  for (const [key, proto] of Object.entries(def.protos)) if (proto.marks) state.legacy.marks[key] = proto.marks;
   // A new game comes in its box: the table stays empty until every pack is opened.
   state.box = def.unboxing ? { open: false, done: false, packs: Object.fromEntries(Object.keys(def.decks).map((id) => [id, 'sealed'])) } : null;
   return state;
@@ -57,6 +67,11 @@ export function setup(state) {
 /** `fx` is an optional cosmetic effect the clients play along with the log line. */
 function emit(state, seat, text, fx) {
   state.events.push({ seat, text, fx });
+}
+
+/** A line only one player gets to read. */
+function whisper(state, seat, text) {
+  state.events.push({ seat, text, only: seat });
 }
 
 function seatName(state, seat) {
@@ -414,7 +429,83 @@ const handlers = {
     }
   },
 
+  // ---- a game that lives: cards get written on, torn, and new ones appear
+
+  /** Alters cards for good. Only face-up cards: what is done to a card is done in front of everyone. */
+  mark(state, seat, action) {
+    const cards = cardsOf(state, action.cards);
+    if (cards.some((card) => !card.faceUp)) refuse('Posez d’abord la carte face visible : on ne modifie une carte que devant tout le monde.');
+    let verb;
+    const change = (marks) => {
+      if (action.erase === true) return (verb = 'remet à neuf', {});
+      if (typeof action.note === 'string') return (verb = 'écrit sur', { ...marks, note: action.note });
+      if (action.scribble === true) return (verb = 'griffonne', { ...marks, scribble: !marks.scribble });
+      if (action.torn === true) return (verb = 'déchire', { ...marks, torn: true });
+      if (STICKERS.includes(action.sticker)) return (verb = `colle ${action.sticker} sur`, { ...marks, stickers: [...(marks.stickers ?? []), action.sticker].slice(-6) });
+      return refuse('Modification inconnue.');
+    };
+    for (const key of new Set(cards.map((card) => card.proto))) {
+      const proto = state.def.protos[key];
+      let marks;
+      try {
+        marks = normalizeMarks(change(proto.marks ?? {}));
+      } catch (error) {
+        if (error instanceof DefinitionError) refuse('Annotation invalide.');
+        throw error;
+      }
+      if (marks) state.legacy.marks[key] = proto.marks = marks;
+      else {
+        delete proto.marks;
+        delete state.legacy.marks[key];
+      }
+    }
+    emit(state, seat, `${verb} ${describe(state, cards.map((c) => protoName(state, c)))}`, { kind: 'mark', cards: cards.map((c) => c.id) });
+  },
+
+  /** Writes a brand new card into the game; it will be there in the next games too. */
+  addCard(state, seat, action) {
+    if (!Object.hasOwn(state.def.decks, action.deck)) refuse('Paquet inconnu.');
+    zoneOf(state, action.to);
+    if (Object.keys(state.legacy.added).length >= MAX_ADDED) refuse('Trop de cartes ajoutées à ce jeu.');
+    let face;
+    try {
+      face = normalizeNewCard(action.card);
+    } catch (error) {
+      if (error instanceof DefinitionError) refuse(error.message);
+      throw error;
+    }
+    let n = 1;
+    while (state.def.protos[`${action.deck}/ajout-${n}`]) n++;
+    const key = `${action.deck}/ajout-${n}`;
+    state.legacy.added[key] = state.def.protos[key] = { ...face, deck: action.deck };
+    state.def.decks[action.deck].list.push(key);
+    spawnCard(state, key, action.to);
+    emit(state, seat, `ajoute une nouvelle carte au jeu : « ${face.name} » (${zoneLabel(state, action.to)})`);
+  },
+
   // ---- mischief: the things one can only do around a real table
+
+  /**
+   * A glance at somebody else's hand. Each try shows one more card, only to
+   * the cheat — or gets them caught in front of everyone, and the more one
+   * has already seen, the likelier that is.
+   */
+  spy(state, seat, action) {
+    if (!state.def.cheating) refuse('On ne triche pas à cette table.');
+    const { zone, seat: owner } = zoneOf(state, action.zone);
+    if (zone.visibility !== 'owner' || owner === seat || !state.activeSeats.includes(owner)) refuse('Il n’y a rien à lorgner ici.');
+    const hidden = state.zones[action.zone].map((id) => state.cards[id]).filter((card) => !card.faceUp);
+    const unseen = hidden.filter((card) => !card.peek.includes(seat));
+    if (!unseen.length) refuse('Vous avez déjà tout vu.');
+    const seen = hidden.length - unseen.length;
+    if (nextRandom(state) < Math.min(0.8, 0.25 + 0.15 * seen)) {
+      for (const card of hidden) card.peek = card.peek.filter((s) => s !== seat);
+      emit(state, seat, `se fait prendre à lorgner le jeu de ${seatName(state, owner)} !`, { kind: 'caught', from: seat, to: owner });
+      return;
+    }
+    unseen[randomInt(state, unseen.length)].peek.push(seat);
+    whisper(state, seat, `🤫 Vous apercevez une carte de ${seatName(state, owner)}. Personne n’a rien remarqué…`);
+  },
 
   sweep(state, seat, action) {
     if (zoneOf(state, action.zone).zone.layout !== 'free') refuse('On ne balaie que les zones libres.');

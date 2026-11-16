@@ -26,5 +26,5 @@ export function viewFor(state, seat) {
       return out;
     });
   }
-  return { zones, counters: state.counters, turn: state.turn, stains: state.stains, box: state.box };
+  return { zones, counters: state.counters, turn: state.turn, stains: state.stains, box: state.box, legacy: state.legacy };
 }

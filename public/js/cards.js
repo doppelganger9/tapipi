@@ -38,6 +38,15 @@ function faceEl(proto, detailed) {
   return face;
 }
 
+/** What players did to the card over the games, drawn on top of its face. */
+function marksEl(marks) {
+  const layer = h('div', { class: `marks ${marks.torn ? 'torn' : ''}` });
+  if (marks.scribble) layer.append(h('span', { class: 'scribble' }));
+  if (marks.note) layer.append(h('span', { class: 'note' }, marks.note));
+  if (marks.stickers) layer.append(h('span', { class: 'stickers' }, marks.stickers.map((s) => h('i', {}, s))));
+  return layer;
+}
+
 /**
  * `card` is a view card: `{ id, up, p? (prototype key, when visible), d? (deck) }`.
  * `detailed` renders the rules text too (used for the large preview).
@@ -51,8 +60,10 @@ export function cardEl(def, card, { detailed = false } = {}) {
     if (proto.size) el.style.setProperty('--s', proto.size);
     if (proto.ratio) el.style.setProperty('--r', proto.ratio);
     if (proto.fixed) el.classList.add('fixed');
+    if (proto.marks?.torn) el.classList.add('torn');
     el.title = proto.name;
     el.append(faceEl(proto, detailed));
+    if (proto.marks) el.append(marksEl(proto.marks));
   } else {
     const back = def.decks[card.d]?.back ?? { color: '#1d3557', label: '✦' };
     const backEl = h('div', { class: 'back' }, h('span', {}, back.label));

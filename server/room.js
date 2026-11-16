@@ -7,6 +7,7 @@
 import { randomUUID, randomInt } from 'node:crypto';
 import { applyAction, createGame, setup } from '../shared/engine.js';
 import { viewFor } from '../shared/view.js';
+import { exportDefinition } from '../shared/definition.js';
 
 const LOG_SIZE = 200;
 
@@ -23,7 +24,8 @@ export class Room {
   // -------------------------------------------------------------- game
 
   load(def) {
-    this.def = def;
+    // A private copy: play may alter the game itself (marked or added cards).
+    this.def = def = structuredClone(def);
     this.state = createGame(def, randomInt(2 ** 32));
     // Seats beyond the new game's capacity become spectators.
     this.seats.length = def.players.max;
@@ -109,6 +111,9 @@ export class Room {
         this.say(client.seat, text, client.name, 'chat');
         return;
       }
+      case 'save':
+        // The game as it is now, to keep as a file and reopen another day.
+        return client.send({ t: 'saved', def: exportDefinition(this.def) });
       case 'restart':
         if (!this.requireHost(client)) return;
         this.restart();
@@ -120,9 +125,9 @@ export class Room {
         this.load(def);
         for (const other of this.clients) {
           other.send({ t: 'welcome', room: this.code, seat: other.seat, token: this.seats[other.seat]?.token ?? null });
-          other.send({ t: 'def', def });
+          other.send({ t: 'def', def: this.def });
         }
-        this.say(client.seat, `installe le jeu « ${def.name} ».`, client.name);
+        this.say(client.seat, `installe le jeu « ${this.def.name} ».`, client.name);
         break;
       }
       default:
@@ -149,7 +154,11 @@ export class Room {
   }
 
   flushEvents() {
-    for (const event of this.state.events.splice(0)) this.say(event.seat, event.text, this.seats[event.seat]?.name, 'event', event.fx);
+    for (const event of this.state.events.splice(0)) {
+      if (event.only === undefined) this.say(event.seat, event.text, this.seats[event.seat]?.name, 'event', event.fx);
+      // A whisper reaches one seat and leaves no trace in the history.
+      else for (const client of this.clients) if (client.seat === event.only) client.send({ t: 'log', entries: [{ seat: null, name: null, text: event.text, kind: 'whisper', at: Date.now() }] });
+    }
   }
 
   broadcast() {

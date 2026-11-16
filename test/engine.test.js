@@ -176,3 +176,64 @@ test('stacked moves make a pile; fixed boards never move', () => {
   applyAction(state, 0, { type: 'macro', id: 'ranger' });
   assert.deepEqual(state.zones.plateau, [board]);
 });
+
+test('lorgner une main : une carte de plus par essai, ou pris sur le fait', async () => {
+  const { exportDefinition } = await import('../shared/definition.js');
+  const raw = JSON.parse(await (await import('node:fs/promises')).readFile(new URL('../games/02-classique-52.json', import.meta.url), 'utf8'));
+  let caught = 0;
+  let seen = 0;
+  for (let seed = 1; seed <= 40; seed++) {
+    const state = createGame(normalizeDefinition({ ...raw, unboxing: false }), seed);
+    state.activeSeats = [0, 1];
+    setup(state);
+    const hand = `${state.def.ui.hand}@1`;
+    for (const card of Object.values(state.cards).slice(0, 5)) applyAction(state, 1, { type: 'move', cards: [card.id], to: hand });
+    state.events.length = 0;
+    assert.ok(applyAction(state, 0, { type: 'spy', zone: `${state.def.ui.hand}@0` }).error, 'pas sa propre main');
+    assert.ok(applyAction(state, 0, { type: 'spy', zone: hand }).ok);
+    const [event] = state.events;
+    const peeked = viewFor(state, 0).zones[hand].filter((c) => c.p).length;
+    if (event.fx?.kind === 'caught') { caught++; assert.equal(peeked, 0); assert.equal(event.only, undefined); }
+    else { seen++; assert.equal(peeked, 1); assert.equal(event.only, 0); }
+    assert.equal(viewFor(state, 1).zones[hand].length, 5);
+  }
+  assert.ok(caught > 3 && seen > 15, `${caught} pris, ${seen} réussis`);
+  const noCheat = createGame(normalizeDefinition({ ...raw, unboxing: false, cheating: false }), 1);
+  noCheat.activeSeats = [0, 1];
+  setup(noCheat);
+  assert.ok(applyAction(noCheat, 0, { type: 'spy', zone: `${noCheat.def.ui.hand}@1` }).error);
+  assert.deepEqual(normalizeDefinition(exportDefinition(noCheat.def)), noCheat.def, 'export puis import : même jeu');
+});
+
+test('un jeu qui évolue : cartes marquées et ajoutées survivent à la partie et à la sauvegarde', async () => {
+  const { exportDefinition } = await import('../shared/definition.js');
+  const raw = JSON.parse(await (await import('node:fs/promises')).readFile(new URL('../games/02-classique-52.json', import.meta.url), 'utf8'));
+  const state = createGame(normalizeDefinition({ ...raw, unboxing: false }), 7);
+  state.activeSeats = [0, 1];
+  setup(state);
+  const before = Object.keys(state.cards).length;
+  const card = Object.values(state.cards)[0];
+  assert.ok(applyAction(state, 0, { type: 'mark', cards: [card.id], note: 'x' }).error, 'face cachée : refusé');
+  applyAction(state, 0, { type: 'flip', cards: [card.id], faceUp: true });
+  assert.ok(applyAction(state, 0, { type: 'mark', cards: [card.id], note: 'Atout de mamie' }).ok);
+  assert.ok(applyAction(state, 0, { type: 'mark', cards: [card.id], sticker: '⭐' }).ok);
+  assert.ok(applyAction(state, 0, { type: 'mark', cards: [card.id], torn: true }).ok);
+  assert.ok(applyAction(state, 0, { type: 'mark', cards: [card.id], sticker: '<b>' }).error);
+  assert.deepEqual(viewFor(state, 1).legacy.marks[card.proto], { note: 'Atout de mamie', torn: true, stickers: ['⭐'] });
+  const to = state.def.zones.find((z) => z.owner === 'table').id;
+  assert.ok(applyAction(state, 1, { type: 'addCard', deck: Object.keys(state.def.decks)[0], to, card: { name: 'Le Fou', text: 'Bat tout.', image: 'https://x/y.png', fixed: true } }).ok);
+  assert.ok(applyAction(state, 1, { type: 'addCard', deck: 'nope', to, card: { name: 'x' } }).error);
+  assert.ok(applyAction(state, 1, { type: 'addCard', deck: Object.keys(state.def.decks)[0], to, card: {} }).error);
+  const added = Object.values(viewFor(state, 0).legacy.added);
+  assert.equal(added.length, 1);
+  assert.equal(added[0].image, undefined);
+  assert.equal(added[0].fixed, undefined);
+  setup(state); // new game: the game itself has changed
+  assert.equal(Object.keys(state.cards).length, before + 1);
+  assert.equal(state.def.protos[card.proto].marks.note, 'Atout de mamie');
+  const reopened = createGame(normalizeDefinition(exportDefinition(state.def)), 1);
+  assert.equal(reopened.box, null);
+  assert.equal(reopened.legacy.marks[card.proto].torn, true);
+  assert.equal(reopened.def.decks[Object.keys(state.def.decks)[0]].list.length, state.def.decks[Object.keys(state.def.decks)[0]].list.length);
+  assert.ok(applyAction(state, 0, { type: 'flip', cards: [state.zones[Object.keys(state.zones).find((k) => state.zones[k].length)][0]], faceUp: true }).ok);
+});

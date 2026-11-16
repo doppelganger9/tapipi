@@ -115,6 +115,27 @@
       <div class="dlg-actions"><button value="cancel" formnovalidate>Annuler</button><button value="ok" class="primary">Lancer</button></div>
     </form>
   </dialog>
+  <dialog id="noteDlg" class="form-dlg">
+    <form method="dialog" id="noteForm">
+      <h2>Écrire sur la carte</h2>
+      <p class="muted">Au feutre indélébile : la carte gardera ce mot d'une partie à l'autre.</p>
+      <label>Votre mot <input name="note" maxlength="60" required autocomplete="off"></label>
+      <div class="dlg-actions"><button value="cancel" formnovalidate>Annuler</button><button value="ok" class="primary">Écrire</button></div>
+    </form>
+  </dialog>
+  <dialog id="cardDlg" class="form-dlg">
+    <form method="dialog" id="cardForm">
+      <h2>Ajouter une carte au jeu</h2>
+      <p class="muted">Elle rejoint le jeu pour de bon : elle sera encore là à la prochaine partie.</p>
+      <label>Nom <input name="name" maxlength="60" required autocomplete="off"></label>
+      <label>Type <input name="type" maxlength="40" autocomplete="off"></label>
+      <label>Symbole (un émoji) <input name="art" maxlength="16" autocomplete="off"></label>
+      <label>Texte <textarea name="text" maxlength="600" rows="3"></textarea></label>
+      <label>Dans quel paquet <select name="deck"></select></label>
+      <label>Où la poser <select name="to"></select></label>
+      <div class="dlg-actions"><button value="cancel" formnovalidate>Annuler</button><button value="ok" class="primary">Ajouter</button></div>
+    </form>
+  </dialog>
   <dialog id="rulesDlg"><h2 id="rulesTitle"></h2><pre id="rulesText"></pre><form method="dialog"><button class="primary">Fermer</button></form></dialog>
   <dialog id="changeDlg"><h2>Changer de jeu</h2><div id="picker2" class="picker"></div><form method="dialog"><button>Annuler</button></form></dialog>
   <div id="toast" class="toast" hidden role="alert"></div>

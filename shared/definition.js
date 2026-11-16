@@ -97,7 +97,34 @@ function normalizeFace(raw, where) {
     face.ratio = raw.ratio;
   }
   if (raw.fixed === true) face.fixed = true;
+  if (raw.marks != null) {
+    const marks = normalizeMarks(raw.marks, `${where}.marks`);
+    if (marks) face.marks = marks;
+  }
   return face;
+}
+
+/**
+ * What players did to a card over the games: a card can be written on,
+ * scribbled over, torn, and covered with stickers. Returns null when untouched.
+ */
+export function normalizeMarks(raw, where = 'marks') {
+  object(raw, where);
+  const marks = {};
+  const note = text(raw.note, 60, `${where}.note`).trim();
+  if (note) marks.note = note;
+  if (raw.scribble === true) marks.scribble = true;
+  if (raw.torn === true) marks.torn = true;
+  const stickers = list(raw.stickers, 6, `${where}.stickers`).map((s, i) => text(s, 8, `${where}.stickers[${i}]`).trim()).filter(Boolean);
+  if (stickers.length) marks.stickers = stickers;
+  return Object.keys(marks).length ? marks : null;
+}
+
+/** A card written by a player during a game: text only, no shape nor image. */
+export function normalizeNewCard(raw) {
+  object(raw, 'Carte');
+  const { name, type, cost, art, stats, text: body, color: tint } = raw;
+  return normalizeFace({ name, type, cost, art, stats, text: body, color: tint ?? undefined }, 'Carte');
 }
 
 const SUITS = [['S', '♠', 'pique', '#1b1b1f'], ['H', '♥', 'cœur', '#c62828'], ['D', '♦', 'carreau', '#c62828'], ['C', '♣', 'trèfle', '#1b1b1f']];
@@ -220,6 +247,7 @@ export function normalizeDefinition(raw) {
     duration: text(raw.duration, 20, 'duration'),
     // "How to play" in a few lines, shown to every player who sits down.
     unboxing: raw.unboxing !== false, // sealed box and packs to open before the first game
+    cheating: raw.cheating !== false, // may players try to glance at each other's hand?
     quickstart: list(raw.quickstart, 6, 'quickstart').map((line, i) => text(line, 160, `quickstart[${i}]`)).filter(Boolean),
     players: { min: int(players.min, 1, 8, 1, 'players.min'), max: int(players.max, 1, 8, 4, 'players.max') },
     protos: {},
@@ -321,4 +349,32 @@ export function normalizeDefinition(raw) {
   if (def.ui.hand && def.zones.find((z) => z.id === def.ui.hand).owner !== 'player') fail('ui.hand doit désigner une zone de joueur.');
 
   return def;
+}
+
+
+/**
+ * The reverse of `normalizeDefinition`: a game file describing the game as it
+ * is now — cards added or altered during play included — so a table can be
+ * saved and reopened later. The box of a saved game is already open.
+ */
+export function exportDefinition(def) {
+  const decks = {};
+  for (const [deckId, deck] of Object.entries(def.decks)) {
+    const counts = new Map();
+    for (const key of deck.list) counts.set(key, (counts.get(key) ?? 0) + 1);
+    decks[deckId] = {
+      name: deck.name,
+      back: deck.back,
+      cards: [...counts].map(([key, count]) => {
+        const { deck: _deck, ...face } = def.protos[key];
+        return { id: key.slice(deckId.length + 1), ...face, ...(count > 1 ? { count } : {}) };
+      }),
+    };
+  }
+  const { format, id, name, description, author, license, rules, duration, cheating, quickstart, players, zones, counters, setup, macros, ui, table } = def;
+  return structuredClone({
+    format, id, name, description, author, license, duration, players, unboxing: false, cheating, quickstart, rules, table, decks, zones, counters, setup,
+    macros: macros.map(({ on, ...macro }) => (on ? { ...macro, on } : macro)),
+    ui: Object.fromEntries(Object.entries(ui).filter(([, zone]) => zone)),
+  });
 }
