@@ -71,6 +71,7 @@ const def = {
   name: 'Chaudrons & Chardons',
   description: "Un jeu original fourni avec Tapipi : brassez des potions avant vos rivaux et semez des chardons dans leurs chaudrons. Sert aussi de modèle pour créer votre propre jeu.",
   author: 'Tapipi',
+  category: 'Créations Tapipi',
   license: 'CC-BY-4.0',
   players: { min: 2, max: 5 },
   duration: '15 min',

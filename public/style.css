@@ -434,3 +434,16 @@ button.pack:hover:not(:disabled), button.sheet:hover:not(:disabled) { border: 0;
   .topbar > * { padding: 6px 10px; }
 }
 @media (prefers-reduced-motion: reduce) { .card { transition: none; } .stain, .coach-target, .gamebox, .caught { animation: none; } }
+
+/* ------------------------------------------------------------ catalogue */
+.search { width: 100%; font: 700 1.1rem var(--mono); padding: 16px; border-width: 4px; margin-bottom: 10px; }
+.search::placeholder { color: var(--muted); }
+.shelf { counter-reset: game; margin-top: 34px; display: grid; }
+.shelf h3 { justify-self: start; }
+.shelf h3 { display: inline-block; font-size: 2rem; background: var(--black); color: var(--paper); padding: 4px 12px 6px; rotate: -1.2deg; margin-bottom: 4px; }
+.shelf:nth-of-type(even) h3 { rotate: 1deg; background: var(--red); color: var(--black); }
+.shelf h3 small { font: 700 .8rem var(--mono); color: var(--yellow); vertical-align: top; }
+.shelf:nth-of-type(even) h3 small { color: var(--black); }
+.shelf .game strong { font-size: 1.9rem; flex-basis: 260px; }
+.shelf .game { padding-top: 12px; padding-bottom: 12px; }
+#picker2 { max-height: 60vh; overflow-y: auto; }

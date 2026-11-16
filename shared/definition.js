@@ -87,7 +87,7 @@ function normalizeFace(raw, where) {
   const shape = oneOf(raw.shape, ['card', 'square', 'round'], 'card', `${where}.shape`);
   if (shape !== 'card') face.shape = shape;
   if (raw.size != null) {
-    if (typeof raw.size !== 'number' || !(raw.size >= 0.3 && raw.size <= 12)) fail(`${where}.size : nombre entre 0.3 et 12 attendu.`);
+    if (typeof raw.size !== 'number' || !(raw.size >= 0.15 && raw.size <= 12)) fail(`${where}.size : nombre entre 0.15 et 12 attendu.`);
     face.size = raw.size;
   }
   // `size` scales the width (1 = a standard card); `ratio` is height / width.
@@ -241,6 +241,7 @@ export function normalizeDefinition(raw) {
     id: ident(raw.id, 'id'),
     name: text(raw.name, 60, 'name') || fail('"name" est obligatoire.'),
     description: text(raw.description, 300, 'description'),
+    category: text(raw.category, 40, 'category'), // the shelf it sits on in the lobby
     author: text(raw.author, 80, 'author'),
     license: text(raw.license, 80, 'license'),
     rules: text(raw.rules, 12000, 'rules'),
@@ -371,9 +372,9 @@ export function exportDefinition(def) {
       }),
     };
   }
-  const { format, id, name, description, author, license, rules, duration, cheating, quickstart, players, zones, counters, setup, macros, ui, table } = def;
+  const { category, format, id, name, description, author, license, rules, duration, cheating, quickstart, players, zones, counters, setup, macros, ui, table } = def;
   return structuredClone({
-    format, id, name, description, author, license, duration, players, unboxing: false, cheating, quickstart, rules, table, decks, zones, counters, setup,
+    format, id, name, category, description, author, license, duration, players, unboxing: false, cheating, quickstart, rules, table, decks, zones, counters, setup,
     macros: macros.map(({ on, ...macro }) => (on ? { ...macro, on } : macro)),
     ui: Object.fromEntries(Object.entries(ui).filter(([, zone]) => zone)),
   });

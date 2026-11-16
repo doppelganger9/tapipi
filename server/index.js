@@ -55,7 +55,7 @@ const server = http.createServer(async (req, res) => {
     const { pathname } = new URL(req.url, 'http://localhost');
     if (pathname === '/api/games') {
       const summary = [...games.values()].map(({ def, file }) => ({
-        id: def.id, name: def.name, description: def.description, players: def.players, duration: def.duration, file: `/games/${file}`,
+        id: def.id, name: def.name, category: def.category, description: def.description, players: def.players, duration: def.duration, file: `/games/${file}`,
       }));
       res.writeHead(200, { 'content-type': 'application/json; charset=utf-8' });
       return res.end(JSON.stringify(summary));

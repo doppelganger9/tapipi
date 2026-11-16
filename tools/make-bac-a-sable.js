@@ -29,6 +29,7 @@ const def = {
   name: 'Bac à sable : plateau et pions',
   description: 'Un plateau, des pions empilables, des tuiles carrées et des cartes de toutes tailles. Pour inventer un jeu ou jouer aux dames.',
   author: 'Tapipi',
+  category: 'Plateaux et pions',
   license: 'CC0-1.0',
   players: { min: 1, max: 6 },
   quickstart: [

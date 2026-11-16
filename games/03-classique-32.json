@@ -185,5 +185,6 @@
     "Distribuez avec une action de table (à droite).",
     "Double-clic sur une carte de votre main pour la jouer sur le tapis.",
     "Le gagnant du pli sélectionne les cartes et les glisse sur sa pile « Plis »."
-  ]
+  ],
+  "category": "Cartes traditionnelles"
 }

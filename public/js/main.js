@@ -156,11 +156,23 @@ async function gamePicker(container, onPick) {
   try { draft = JSON.parse(store.get('tapis:draft')); } catch { /* no draft */ }
   const seats = (p) => (p.min === p.max ? `${p.max} joueurs` : `${p.min}–${p.max} joueurs`);
 
+  const row = (game, featured) => h('button', { class: `game ${featured ? 'featured' : ''}`, 'data-find': `${game.name} ${game.description}`.toLowerCase(), onclick: () => onPick({ game: game.id }) },
+    h('strong', {}, game.name),
+    h('span', { class: 'meta' }, [seats(game.players), game.duration].filter(Boolean).join(' · ')),
+    h('span', {}, game.description));
+  // The catalogue is long: a search field, and one shelf per category.
+  const shelves = [...new Set(games.slice(1).map((g) => g.category || 'Autres'))];
+  const search = h('input', { class: 'search', type: 'search', placeholder: `Chercher parmi ${games.length} jeux : belote, dames, loto…`, 'aria-label': 'Chercher un jeu', oninput: () => {
+    const words = search.value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').split(/\s+/).filter(Boolean);
+    for (const el of container.querySelectorAll('.game[data-find]')) el.hidden = !words.every((w) => el.dataset.find.normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(w));
+    for (const el of container.querySelectorAll('.shelf')) el.hidden = !el.querySelector('.game:not([hidden])');
+  } });
+
   fill(container,
-    games.map((game, i) => h('button', { class: `game ${i === 0 ? 'featured' : ''}`, onclick: () => onPick({ game: game.id }) },
-      h('strong', {}, game.name),
-      h('span', { class: 'meta' }, [seats(game.players), game.duration].filter(Boolean).join(' · ')),
-      h('span', {}, game.description))),
+    row(games[0], true),
+    search,
+    shelves.map((shelf) => h('div', { class: 'shelf' }, h('h3', {}, shelf, h('small', {}, ` ${games.slice(1).filter((g) => (g.category || 'Autres') === shelf).length}`)),
+      games.slice(1).filter((g) => (g.category || 'Autres') === shelf).map((g) => row(g, false)))),
     draft?.name && h('button', { class: 'game draft', onclick: () => onPick({ def: draft }) },
       h('strong', {}, draft.name), h('span', { class: 'meta' }, 'votre brouillon'), h('span', {}, "Le jeu en cours de création dans l'éditeur.")),
     h('div', { class: 'own' },

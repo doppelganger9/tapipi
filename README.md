@@ -143,3 +143,11 @@ Chardons » sous CC BY 4.0.
 Tapipi n'utilise aucun emoji. Le champ `art` d'une carte accepte un mot court, un chiffre, ou le nom d'un pictogramme maison précédé de deux-points : `":flamme"`, `":crane"`, `":de"`… La liste complète est dans `public/js/glyphs.js` ; l'éditeur et la boîte « Ajouter une carte » la proposent à la saisie.
 
 Les polices (Anton, Archivo, JetBrains Mono, licence OFL) sont servies depuis `public/fonts/` : aucun appel à un service tiers.
+
+## Le catalogue
+
+`node tools/make-catalogue.js` génère les jeux `games/c-*.json` : cartes traditionnelles, plateaux et pions, créations Tapipi. Règle de la maison pour y ajouter un jeu :
+
+- uniquement des jeux traditionnels du domaine public, sous leur nom courant, ou des créations originales ;
+- jamais la copie d'un jeu édité, même renommé ou redessiné : ni sa liste de cartes, ni ses textes, ni un nom qui l'évoque ;
+- le matériel est dessiné par Tapipi ; aucune règle n'est fournie pour les jeux traditionnels.
