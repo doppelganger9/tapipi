@@ -3,7 +3,7 @@
   "id": "bac-a-sable",
   "name": "Bac à sable : plateau et pions",
   "description": "Un plateau, des pions empilables, des tuiles carrées et des cartes de toutes tailles. Pour inventer un jeu ou jouer aux dames.",
-  "author": "Tapis",
+  "author": "Tapipi",
   "license": "CC0-1.0",
   "players": {
     "min": 1,

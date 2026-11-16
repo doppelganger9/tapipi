@@ -4,7 +4,7 @@
   "cheating": false,
   "name": "Estimation d'équipe",
   "description": "Pour chiffrer des tâches entre collègues : chacun pose une carte face cachée, puis on révèle tout en même temps.",
-  "author": "Tapis",
+  "author": "Tapipi",
   "license": "CC0-1.0",
   "players": {
     "min": 2,

@@ -3,7 +3,7 @@
   "id": "classique-52",
   "name": "Jeu de 52 cartes",
   "description": "Table libre avec un jeu traditionnel de 52 cartes et 2 jokers. Pour le rami, le président, le poker, le huit américain… à vous d'appliquer les règles.",
-  "author": "Tapis",
+  "author": "Tapipi",
   "license": "CC0-1.0",
   "players": {
     "min": 1,

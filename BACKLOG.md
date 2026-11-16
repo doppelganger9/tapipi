@@ -1,4 +1,4 @@
-# Backlog Tapis
+# Backlog Tapipi
 
 Lots ordonnés : chacun se termine par quelque chose de jouable et vérifiable. « Majeur » = change ce
 que le produit permet ; « mineur » = finition d'un lot. Avant chaque lot : `npm test` et le parcours

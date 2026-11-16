@@ -1,4 +1,4 @@
-# Tapis is one Node process with no database: build, run, expose one port.
+# Tapipi is one Node process with no database: build, run, expose one port.
 FROM node:22-alpine
 WORKDIR /app
 COPY package*.json ./

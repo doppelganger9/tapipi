@@ -1,4 +1,4 @@
-# Tapis
+# Tapipi
 
 Une table de jeu multijoueur en ligne qui ne connaît aucun jeu : elle simule une table
 (cartes, tuiles, pions, zones, compteurs, dés) et charge un **fichier de jeu** qui décrit le
@@ -15,7 +15,7 @@ créer ses cartes et de jouer aussitôt avec. La suite du développement est dan
 
 ## Où tourne le serveur ?
 
-Tapis est **un seul processus Node, sans base de données** : les tables vivent en mémoire et
+Tapipi est **un seul processus Node, sans base de données** : les tables vivent en mémoire et
 disparaissent 30 minutes après le départ du dernier joueur (ou au redémarrage). Pour jouer avec
 des amis, ce processus doit être joignable depuis Internet :
 
@@ -124,7 +124,7 @@ des règles automatiques pour un jeu donné viendraient se brancher comme valida
 
 ## Contenus et droits
 
-Tapis ne distribue que des jeux traditionnels (domaine public) et des jeux originaux, dessinés
+Tapipi ne distribue que des jeux traditionnels (domaine public) et des jeux originaux, dessinés
 à partir de texte et d'emoji. Les fichiers chargés par les joueurs ne sont ni stockés ni
 publiés : ils vivent en mémoire le temps de la table. Code sous licence MIT ; « Chaudrons &
 Chardons » sous CC BY 4.0.

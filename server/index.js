@@ -148,4 +148,4 @@ wss.on('connection', (ws) => {
   ws.on('error', () => {});
 });
 
-server.listen(PORT, () => console.log(`Tapis — http://localhost:${PORT} (${games.size} jeux fournis)`));
+server.listen(PORT, () => console.log(`Tapipi — http://localhost:${PORT} (${games.size} jeux fournis)`));

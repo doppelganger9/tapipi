@@ -239,7 +239,7 @@ $('wCopy').addEventListener('click', async () => {
   }
   setTimeout(() => { $('wCopy').textContent = 'Copier le lien'; }, 2500);
 });
-$('wShare').addEventListener('click', () => navigator.share({ title: 'Tapis', text: `Viens jouer à ${S.def.name} !`, url: location.href }).catch(() => {}));
+$('wShare').addEventListener('click', () => navigator.share({ title: 'Tapipi', text: `Viens jouer à ${S.def.name} !`, url: location.href }).catch(() => {}));
 $('wRules').addEventListener('click', () => $('rulesDlg').showModal());
 $('wGo').addEventListener('click', () => $('welcomeDlg').close());
 function startCoach() {

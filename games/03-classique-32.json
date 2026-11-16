@@ -3,7 +3,7 @@
   "id": "classique-32",
   "name": "Jeu de 32 cartes",
   "description": "Le paquet de 32 cartes (du 7 à l'as) des jeux de levées traditionnels : belote, manille, écarté…",
-  "author": "Tapis",
+  "author": "Tapipi",
   "license": "CC0-1.0",
   "players": {
     "min": 2,
