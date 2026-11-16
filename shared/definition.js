@@ -123,6 +123,7 @@ function normalizeDeck(deckId, raw, def) {
   object(raw, where);
   const back = raw.back ? object(raw.back, `${where}.back`) : {};
   const deck = {
+    name: text(raw.name, 40, `${where}.name`) || deckId,
     back: {
       color: back.color != null && COLOR.test(String(back.color)) ? back.color : '#1d3557',
       label: text(back.label, 4, `${where}.back.label`) || '✦',
@@ -150,7 +151,18 @@ function normalizeDeck(deckId, raw, def) {
 // ---------------------------------------------------------------- steps
 
 /** Steps are the small declarative vocabulary used by `setup` and by macros. */
-function normalizeSteps(raw, def, where, { allowSpawn }) {
+const PARAM = /^[a-z][A-Za-z0-9]{0,15}$/;
+
+function normalizeSteps(raw, def, where, { allowSpawn, params = [] }) {
+  // A count is a number, "all", or "$name": the value of a script parameter.
+  const countOf = (value, w) => {
+    if (value === 'all' || value == null) return 'all';
+    if (typeof value === 'string' && value.startsWith('$')) {
+      if (!params.includes(value.slice(1))) fail(`${w} : paramètre inconnu "${value}".`);
+      return value;
+    }
+    return int(value, 1, 500, 1, w);
+  };
   const zone = (v, w) => {
     ident(v, w);
     return def.zones.find((z) => z.id === v) ?? fail(`${w} : zone inconnue "${v}".`);
@@ -168,7 +180,8 @@ function normalizeSteps(raw, def, where, { allowSpawn }) {
       case 'deal':
       case 'move': {
         const out = { op: 'move', from: zone(step.from, `${w}.from`).id, to: zone(step.to, `${w}.to`).id };
-        out.count = step.count === 'all' || step.count == null ? 'all' : int(step.count, 1, 500, 1, `${w}.count`);
+        out.count = countOf(step.count, `${w}.count`);
+        if (step.by != null) out.by = int(step.by, 1, 20, 1, `${w}.by`); // cards handed over at a time
         if (typeof step.faceUp === 'boolean') out.faceUp = step.faceUp;
         return out;
       }
@@ -206,6 +219,7 @@ export function normalizeDefinition(raw) {
     rules: text(raw.rules, 12000, 'rules'),
     duration: text(raw.duration, 20, 'duration'),
     // "How to play" in a few lines, shown to every player who sits down.
+    unboxing: raw.unboxing !== false, // sealed box and packs to open before the first game
     quickstart: list(raw.quickstart, 6, 'quickstart').map((line, i) => text(line, 160, `quickstart[${i}]`)).filter(Boolean),
     players: { min: int(players.min, 1, 8, 1, 'players.min'), max: int(players.max, 1, 8, 4, 'players.max') },
     protos: {},
@@ -273,10 +287,23 @@ export function normalizeDefinition(raw) {
   list(raw.macros, LIMITS.macros, 'macros').forEach((rawMacro, i) => {
     const w = `macros[${i}]`;
     object(rawMacro, w);
+    const params = list(rawMacro.params, 3, `${w}.params`).map((rawParam, j) => {
+      const pw = `${w}.params[${j}]`;
+      object(rawParam, pw);
+      if (typeof rawParam.id !== 'string' || !PARAM.test(rawParam.id)) fail(`${pw}.id : nom simple attendu (ex. "n").`);
+      const min = int(rawParam.min, 0, 500, 1, `${pw}.min`);
+      const max = int(rawParam.max, min, 500, Math.max(min, 20), `${pw}.max`);
+      return { id: rawParam.id, name: text(rawParam.name, 30, `${pw}.name`) || rawParam.id, min, max, default: int(rawParam.default, min, max, min, `${pw}.default`) };
+    });
     def.macros.push({
       id: ident(rawMacro.id, `${w}.id`),
       name: text(rawMacro.name, 40, `${w}.name`) || rawMacro.id,
-      steps: normalizeSteps(rawMacro.steps, def, `${w}.steps`, { allowSpawn: false }),
+      // Where the script shows up ("Mise en place", "Tour"…), whom it applies to, and when it fires by itself.
+      group: text(rawMacro.group, 30, `${w}.group`),
+      scope: oneOf(rawMacro.scope, ['all', 'me'], 'all', `${w}.scope`),
+      on: oneOf(rawMacro.on, ['turnStart'], null, `${w}.on`),
+      params,
+      steps: normalizeSteps(rawMacro.steps, def, `${w}.steps`, { allowSpawn: false, params: params.map((p) => p.id) }),
     });
   });
 

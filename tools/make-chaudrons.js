@@ -81,7 +81,7 @@ const def = {
     'Premier à 7 potions : gagné. Terminez chaque tour avec « Fin du tour ».',
   ],
   rules,
-  decks: { grimoire: { back: { color: '#3b2a5c', label: '✦' }, cards } },
+  decks: { grimoire: { name: 'Le grimoire', back: { color: '#3b2a5c', label: '✦' }, cards } },
   zones: [
     { id: 'pioche', name: 'Pioche', visibility: 'hidden', layout: 'stack' },
     { id: 'defausse', name: 'Défausse', visibility: 'public', layout: 'stack' },
@@ -96,7 +96,8 @@ const def = {
     { op: 'deal', from: 'pioche', to: 'main', count: 5 },
   ],
   macros: [
-    { id: 'recycler', name: 'Recycler la défausse', steps: [{ op: 'move', from: 'defausse', to: 'pioche', count: 'all' }, { op: 'shuffle', zone: 'pioche' }] },
+    { id: 'piocher', name: 'Piocher…', group: 'À mon tour', scope: 'me', params: [{ id: 'n', name: 'Cartes à piocher', min: 1, max: 5, default: 1 }], steps: [{ op: 'move', from: 'pioche', to: 'main', count: '$n' }] },
+    { id: 'recycler', name: 'Recycler la défausse', group: 'Entretien', steps: [{ op: 'move', from: 'defausse', to: 'pioche', count: 'all' }, { op: 'shuffle', zone: 'pioche' }] },
   ],
 };
 

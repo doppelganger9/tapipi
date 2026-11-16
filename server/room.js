@@ -34,7 +34,8 @@ export class Room {
 
   restart() {
     this.syncSeats();
-    setup(this.state);
+    // While the box is still sealed there is nothing to set up: unboxing does it.
+    if (!this.state.box || this.state.box.done) setup(this.state);
     this.pristine = true;
   }
 
@@ -99,7 +100,7 @@ export class Room {
         if (client.seat < 0) return client.send({ t: 'error', text: 'Les spectateurs ne peuvent pas jouer.' });
         const result = applyAction(this.state, client.seat, message.a);
         if (result.error) return client.send({ t: 'error', text: result.error });
-        this.pristine = false;
+        if (message.a?.type !== 'unbox') this.pristine = false; // unboxing is not playing yet
         break;
       }
       case 'chat': {

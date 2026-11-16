@@ -4,8 +4,10 @@ Lots ordonnés : chacun se termine par quelque chose de jouable et vérifiable. 
 que le produit permet ; « mineur » = finition d'un lot. Avant chaque lot : `npm test` et le parcours
 à deux navigateurs (créer une table, rejoindre par lien, piocher, jouer, changer de jeu).
 
-État actuel : table générique, 5 jeux fournis, éditeur de cartes, accueil par invitation et
-tutoriel, composants de toutes tailles (plateau fixé), serveur Node en mémoire, Dockerfile.
+État actuel : table générique, 5 jeux fournis, éditeur de cartes et de scripts, accueil par
+invitation et tutoriel, composants de toutes tailles (plateau fixé), sélection au lasso, paquets
+empilables et mélangeables, distribution paramétrable, scripts par phase, déballage de la boîte,
+serveur Node en mémoire, Dockerfile.
 
 ## Lot 1 — Jouable entre amis, pour de vrai (majeur)
 
@@ -20,7 +22,9 @@ Objectif : une soirée complète à 3-5 joueurs, dont certains sur téléphone, 
 - **Majeur — Arrivée en cours de partie.** Un retardataire s'assoit sans cartes. Ajouter au format
   une étape `onJoin` (ex. distribuer 5 cartes) exécutée pour le nouveau siège ; `server/room.js`
   (`join`) et `shared/engine.js` (`runSteps` limité à un siège).
-- Mineur — Remplacer les `prompt()` du menu de zone (piocher N, distribuer N) par un petit pas-à-pas.
+- Mineur — Lasso au doigt (aujourd'hui souris uniquement, pour ne pas gêner le défilement) : appui
+  long puis glisser.
+- Mineur — Tutoriel : ajouter une leçon « lasso et paquets ».
 - Mineur — Appui long sur mobile = sélection ; aperçu de la carte en plein écran au toucher.
 - Mineur — Annuler la dernière action (pile d'instantanés de l'état dans `Room`, 20 niveaux).
 - Mineur — Jouer « Chaudrons & Chardons » à 2, 3 et 5 et ajuster les règles (jamais testées).
@@ -44,13 +48,27 @@ Objectif : jouer confortablement à un jeu de tuiles ou de pions sur plateau.
 - Mineur — Sac opaque : zone dont on tire au hasard (tuiles, jetons).
 - Mineur — Recto et verso distincts pour une même pièce.
 
+## Lot 2 bis — Scripts et phases (majeur)
+
+Fait : scripts paramétrés (`params`), par phase (`group`), pour tous ou pour soi (`scope`),
+automatiques en début de tour (`on: turnStart`), donne par paquets (`by`), éditables dans l'éditeur.
+
+- **Majeur — Phases explicites.** Une liste `phases` dans le fichier (mise en place, tour, fin de
+  manche), la phase courante affichée, un bouton « phase suivante » et les scripts liés à l'entrée
+  dans chaque phase. Aujourd'hui `group` n'est qu'un rangement de boutons.
+- **Majeur — Cibles et conditions.** « Chaque joueur sauf moi », « mon voisin de gauche »,
+  « jusqu'à avoir N cartes en main », « si la pioche est vide, recycler la défausse ».
+- Mineur — Scripts sur les compteurs (+N à moi, à tous) et sur une sélection de cartes.
+- Mineur — Donneur tournant : la donne commence après le donneur, qui change à chaque manche.
+- Mineur — Plusieurs paramètres dans l'éditeur (le format en accepte 3, l'éditeur un seul).
+- Mineur — Tester un script depuis l'éditeur sur une table d'essai.
+
 ## Lot 3 — Éditeur complet (majeur)
 
 Objectif : créer un jeu entier sans toucher au JSON.
 
 - **Majeur — Éditeur de zones** : ajouter, nommer, choisir visibilité et disposition, avec aperçu
   de la table.
-- **Majeur — Éditeur de mise en place et d'actions de table** (liste d'étapes par formulaire).
 - Mineur — Import de cartes depuis un tableur (CSV : une ligne par carte).
 - Mineur — Plusieurs paquets, dos de cartes, image de plateau.
 - Mineur — Export pour impression (planche PDF) : le pont vers le prototypage physique.
@@ -79,6 +97,9 @@ Objectif : retrouver ses jeux et ses tables d'un appareil à l'autre.
 
 ## Lot 6 — Vie autour de la table (mineur, à piocher entre deux lots)
 
+- Déballage : sons (cellophane, carton), détourage pièce par pièce au clic, couvercle en 3D,
+  « remballer la boîte » en fin de soirée, paquets de cartes aléatoires à ouvrir (boosters) pour
+  les jeux à collectionner originaux.
 - Sons (carte posée, mélange, dé) avec réglage muet.
 - Physique légère : inertie au lâcher, dés qui roulent et peuvent sortir de la table.
 - Curseurs des autres joueurs visibles en direct ; pointer une carte.

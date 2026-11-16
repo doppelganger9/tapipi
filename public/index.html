@@ -97,6 +97,24 @@
       <button id="wGo" class="primary big" type="button">C'est parti</button>
     </div>
   </dialog>
+  <dialog id="dealDlg" class="form-dlg">
+    <form method="dialog" id="dealForm">
+      <h2>Distribuer</h2>
+      <p class="muted" id="dealFrom"></p>
+      <label>Combien de cartes par personne <input name="count" type="number" min="1" max="100" value="1" required></label>
+      <label>À qui <select name="who"></select></label>
+      <label>Dans quelle zone <select name="zone"></select></label>
+      <label>Par paquets de <input name="by" type="number" min="1" max="20" value="1" required></label>
+      <div class="dlg-actions"><button value="cancel" formnovalidate>Annuler</button><button value="ok" class="primary">Distribuer</button></div>
+    </form>
+  </dialog>
+  <dialog id="paramDlg" class="form-dlg">
+    <form method="dialog" id="paramForm">
+      <h2 id="paramTitle"></h2>
+      <div id="paramFields"></div>
+      <div class="dlg-actions"><button value="cancel" formnovalidate>Annuler</button><button value="ok" class="primary">Lancer</button></div>
+    </form>
+  </dialog>
   <dialog id="rulesDlg"><h2 id="rulesTitle"></h2><pre id="rulesText"></pre><form method="dialog"><button class="primary">Fermer</button></form></dialog>
   <dialog id="changeDlg"><h2>Changer de jeu</h2><div id="picker2" class="picker"></div><form method="dialog"><button>Annuler</button></form></dialog>
   <div id="toast" class="toast" hidden role="alert"></div>

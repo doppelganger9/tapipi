@@ -19,6 +19,7 @@
   "rules": "CHAUDRONS & CHARDONS — 2 à 5 apprentis herboristes, 15 minutes.\n\nBUT\nÊtre le premier à brasser 7 potions.\n\nMISE EN PLACE\nChacun reçoit 5 cartes. Le reste forme la pioche.\n\nÀ VOTRE TOUR\n1. Piochez une carte (double-clic sur la pioche).\n2. Jouez UNE carte de votre main :\n   • un Ingrédient, face visible dans votre chaudron (5 cartes maximum) ;\n   • un Sortilège : appliquez son effet, puis défaussez-le ;\n   • un Chardon, dans le chaudron d'un adversaire ;\n   • ou défaussez une carte si vous ne pouvez ou ne voulez rien jouer.\n3. Brassez si vous le pouvez, puis cliquez sur « Fin du tour ».\n   Vous ne gardez jamais plus de 7 cartes en main.\n\nBRASSER\nDéfaussez trois ingrédients de votre chaudron pour marquer :\n   • trois valeurs qui se suivent (4-5-6), familles mélangées : 1 potion ;\n   • trois ingrédients de la même famille : 2 potions ;\n   • trois qui se suivent ET de la même famille : 4 potions.\nUn chaudron qui contient un Chardon ne peut pas brasser.\n\nSE DÉBARRASSER D'UN CHARDON\nAu lieu de jouer une carte, défaussez le Chardon avec un ingrédient de votre main de valeur 7 ou plus. Ou utilisez un Sécateur.\n\nPIOCHE VIDE\nUtilisez l'action de table « Recycler la défausse ».",
   "decks": {
     "grimoire": {
+      "name": "Le grimoire",
       "back": {
         "color": "#3b2a5c",
         "label": "✦"
@@ -456,8 +457,32 @@
   ],
   "macros": [
     {
+      "id": "piocher",
+      "name": "Piocher…",
+      "group": "À mon tour",
+      "scope": "me",
+      "params": [
+        {
+          "id": "n",
+          "name": "Cartes à piocher",
+          "min": 1,
+          "max": 5,
+          "default": 1
+        }
+      ],
+      "steps": [
+        {
+          "op": "move",
+          "from": "pioche",
+          "to": "main",
+          "count": "$n"
+        }
+      ]
+    },
+    {
       "id": "recycler",
       "name": "Recycler la défausse",
+      "group": "Entretien",
       "steps": [
         {
           "op": "move",

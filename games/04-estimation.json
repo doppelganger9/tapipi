@@ -152,5 +152,6 @@
     "Double-clic sur une carte de votre main : votre vote part face cachée.",
     "Quand tout le monde a voté : « Révéler les votes ».",
     "On discute des écarts, puis « Nouveau vote »."
-  ]
+  ],
+  "unboxing": false
 }

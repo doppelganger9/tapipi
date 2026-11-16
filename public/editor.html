@@ -27,13 +27,21 @@
         <label>Joueurs max <input id="g-max" type="number" min="1" max="8"></label>
       </div>
       <label>Couleur du tapis <input id="g-felt" type="color"></label>
+      <label class="check"><input id="g-unboxing" type="checkbox"> Boîte scellée à déballer avant la première partie</label>
       <label>Règles <textarea id="g-rules" rows="10"></textarea></label>
-      <p class="hint left">Zones, compteurs et mise en place se règlent dans le fichier exporté (voir le README). L'éditeur les conserve tels quels.</p>
+      <p class="hint left">Zones et compteurs se règlent dans le fichier exporté (voir le README). L'éditeur les conserve tels quels.</p>
     </section>
     <section class="panel">
+      <div class="tabs" role="tablist">
+        <button id="tabCards" class="tab on" role="tab">Cartes et pièces</button>
+        <button id="tabScripts" class="tab" role="tab">Scripts et mise en place</button>
+      </div>
+      <div id="scriptsView" hidden></div>
+      <div id="cardsView">
       <div class="row"><h2>Paquet</h2><select id="deck" aria-label="Paquet"></select><span class="spacer"></span>
         <button id="addBtn" class="primary">+ Carte</button></div>
       <div id="cards" class="thumbs"></div>
+      </div>
     </section>
     <section class="panel" id="cardPanel">
       <h2>La carte</h2>

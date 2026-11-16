@@ -16,7 +16,8 @@
       "back": {
         "color": "#1f4e79",
         "label": "❖"
-      }
+      },
+      "name": "Jeu de 32 cartes"
     }
   },
   "zones": [
@@ -73,6 +74,49 @@
   ],
   "macros": [
     {
+      "id": "donner",
+      "name": "Distribuer…",
+      "group": "Mise en place",
+      "params": [
+        {
+          "id": "n",
+          "name": "Cartes par joueur",
+          "min": 1,
+          "max": 26,
+          "default": 5
+        }
+      ],
+      "steps": [
+        {
+          "op": "deal",
+          "from": "talon",
+          "to": "main",
+          "count": "$n"
+        }
+      ]
+    },
+    {
+      "id": "donne32",
+      "name": "Donne 3 puis 2",
+      "group": "Mise en place",
+      "steps": [
+        {
+          "op": "deal",
+          "from": "talon",
+          "to": "main",
+          "count": 3,
+          "by": 3
+        },
+        {
+          "op": "deal",
+          "from": "talon",
+          "to": "main",
+          "count": 2,
+          "by": 2
+        }
+      ]
+    },
+    {
       "id": "ramasser",
       "name": "Tout ramasser et mélanger",
       "steps": [
@@ -84,31 +128,8 @@
           "op": "shuffle",
           "zone": "talon"
         }
-      ]
-    },
-    {
-      "id": "donne5",
-      "name": "Distribuer 5 cartes à chacun",
-      "steps": [
-        {
-          "op": "deal",
-          "from": "talon",
-          "to": "main",
-          "count": 5
-        }
-      ]
-    },
-    {
-      "id": "donne3",
-      "name": "Distribuer 3 cartes à chacun",
-      "steps": [
-        {
-          "op": "deal",
-          "from": "talon",
-          "to": "main",
-          "count": 3
-        }
-      ]
+      ],
+      "group": "Mise en place"
     },
     {
       "id": "donneTout",
@@ -120,7 +141,8 @@
           "to": "main",
           "count": "all"
         }
-      ]
+      ],
+      "group": "Mise en place"
     },
     {
       "id": "retourne",
@@ -131,6 +153,30 @@
           "from": "talon",
           "to": "tapis",
           "count": 1
+        }
+      ],
+      "group": "Mise en place"
+    },
+    {
+      "id": "piocher",
+      "name": "Piocher…",
+      "group": "À mon tour",
+      "scope": "me",
+      "params": [
+        {
+          "id": "n",
+          "name": "Cartes à piocher",
+          "min": 1,
+          "max": 10,
+          "default": 1
+        }
+      ],
+      "steps": [
+        {
+          "op": "move",
+          "from": "talon",
+          "to": "main",
+          "count": "$n"
         }
       ]
     }

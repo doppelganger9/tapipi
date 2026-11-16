@@ -111,3 +111,68 @@ test('definitions are validated and stripped', () => {
   assert.equal(def.evil, undefined);
   assert.equal(def.zones[0].onclick, undefined);
 });
+
+test('a hand-picked packet is shuffled in place', () => {
+  const state = newGame('02-classique-52.json', [0, 1]);
+  const ids = state.zones.pioche.slice(0, 10);
+  const rest = state.zones.pioche.slice(10);
+  const protos = ids.map((id) => state.cards[id].proto).sort();
+  assert.deepEqual(applyAction(state, 0, { type: 'shuffleCards', cards: ids }), { ok: true });
+  const after = state.zones.pioche.slice(0, 10);
+  assert.ok(after.every((id) => !ids.includes(id)), 'fresh ids');
+  assert.deepEqual(after.map((id) => state.cards[id].proto).sort(), protos, 'same cards');
+  assert.deepEqual(state.zones.pioche.slice(10), rest, 'the rest of the pile is untouched');
+  assert.equal(state.events.pop().fx.kind, 'shuffle');
+});
+
+test('scripts take parameters, apply to one player, and deal by packets', () => {
+  const state = newGame('03-classique-32.json', [0, 1, 2]);
+  applyAction(state, 1, { type: 'macro', id: 'donner', args: { n: 4 } });
+  assert.deepEqual([0, 1, 2].map((s) => state.zones[`main@${s}`].length), [4, 4, 4]);
+  applyAction(state, 1, { type: 'macro', id: 'piocher', args: { n: 999 } }); // clamped to the script's max
+  assert.deepEqual([0, 1, 2].map((s) => state.zones[`main@${s}`].length), [4, 14, 4]);
+  applyAction(state, 0, { type: 'macro', id: 'ramasser' });
+  applyAction(state, 0, { type: 'macro', id: 'donne32' });
+  assert.deepEqual([0, 1, 2].map((s) => state.zones[`main@${s}`].length), [5, 5, 5]);
+  applyAction(state, 0, { type: 'deal', from: 'talon', to: 'main', count: 2, seats: [2] });
+  assert.equal(state.zones['main@2'].length, 7);
+  assert.equal(state.zones['main@0'].length, 5);
+});
+
+test('turn-start scripts fire for the player whose turn begins', () => {
+  const raw = JSON.parse(readFileSync(new URL('../games/02-classique-52.json', import.meta.url), 'utf8'));
+  raw.macros.push({ id: 'auto', name: 'Pioche du tour', scope: 'me', on: 'turnStart', steps: [{ op: 'move', from: 'pioche', to: 'main', count: 2 }] });
+  const state = createGame(normalizeDefinition(raw), 1);
+  state.activeSeats = [0, 1];
+  setup(state);
+  applyAction(state, 0, { type: 'turn' });
+  assert.equal(state.zones['main@1'].length, 2);
+  assert.equal(state.zones['main@0'].length, 0);
+  assert.throws(() => normalizeDefinition({ ...raw, macros: [{ id: 'x', steps: [{ op: 'deal', from: 'pioche', to: 'main', count: '$nope' }] }] }), /paramètre inconnu/);
+});
+
+test('a new game is sealed until every pack is opened', () => {
+  const state = createGame(load('05-bac-a-sable.json'), 3);
+  state.activeSeats = [0];
+  assert.equal(total(state), 0);
+  assert.ok(applyAction(state, 0, { type: 'unbox' }).ok);
+  assert.equal(state.box.open, true);
+  assert.ok(applyAction(state, 0, { type: 'unbox', deck: 'plateau' }).ok);
+  assert.ok(applyAction(state, 0, { type: 'unbox', deck: 'plateau' }).error);
+  assert.equal(total(state), 0);
+  assert.ok(applyAction(state, 0, { type: 'unbox', deck: 'materiel' }).ok);
+  assert.equal(state.box.done, true);
+  assert.ok(total(state) > 50);
+  assert.equal(createGame(load('04-estimation.json'), 1).box, null);
+});
+
+test('stacked moves make a pile; fixed boards never move', () => {
+  const state = newGame('05-bac-a-sable.json', [0]);
+  const pawns = state.zones.reserve.slice(0, 3);
+  applyAction(state, 0, { type: 'move', cards: pawns, to: 'plateau', x: 0.4, y: 0.4, stack: true });
+  assert.ok(pawns.every((id) => state.cards[id].x === 0.4 && state.cards[id].y === 0.4));
+  const board = state.zones.plateau.find((id) => state.def.protos[state.cards[id].proto].fixed);
+  assert.ok(applyAction(state, 0, { type: 'move', cards: [board], to: 'reserve' }).error);
+  applyAction(state, 0, { type: 'macro', id: 'ranger' });
+  assert.deepEqual(state.zones.plateau, [board]);
+});

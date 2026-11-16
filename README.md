@@ -44,6 +44,7 @@ public/            Client sans étape de build (modules ES)
   js/table.js      Rendu + gestes (glisser-déposer, sélection, menus)
   js/cards.js      Dessin d'une carte à partir des données du fichier
   js/onboarding.js Surnoms et tutoriel interactif
+  js/unboxing.js   Boîte scellée, paquets à déchirer, planches à détourer
   js/editor.js     Éditeur de jeu, validation en direct avec shared/definition.js
 games/             Jeux fournis (domaine public ou originaux)
 ```
@@ -54,6 +55,8 @@ Principes :
   le moteur les valide et chaque joueur reçoit *sa* vue. Une carte que vous ne devez pas voir
   n'est jamais envoyée à votre navigateur.
 - **Un mélange est un vrai mélange** : les cartes changent d'identifiant, impossible de les suivre.
+- **Le tapis d'abord** : lasso ou Ctrl-clic pour sélectionner, poser une carte sur une autre pour
+  empiler, pastille du paquet pour le déplacer ou le mélanger entier.
 - **Tout est annoncé** dans le journal (y compris « regarde une carte en secret »), sans jamais
   nommer une carte restée cachée. C'est ce qui remplace l'arbitre.
 - **Moteur sans E/S** et déterministe : testable, rejouable, déplaçable (worker, autre transport).
@@ -109,8 +112,15 @@ des règles automatiques pour un jeu donné viendraient se brancher comme valida
 - Composants : `shape` (`card`, `square`, `round`), `size` (largeur ; 1 = une carte, jusqu'à 12),
   `ratio` (hauteur / largeur), `fixed` (vissé à la table : un plateau). Voir `games/05-bac-a-sable.json`.
 - `quickstart` : jusqu'à 6 lignes « comment jouer », montrées à chaque joueur qui s'assoit.
-- Opérations : `spawn`, `shuffle`, `deal`/`move` (`count` ou `"all"`), `gather`, `flip`, `setCounter`.
+- Opérations : `spawn`, `shuffle`, `deal`/`move` (`count`, `"all"` ou `"$n"` ; `by` = cartes données
+  à la fois, pour une donne « 3 puis 2 »), `gather`, `flip`, `setCounter`.
   Un `spawn` vers une zone de joueur donne un exemplaire du paquet à chacun.
+- Scripts (`macros`) : `group` range le bouton dans une phase (« Mise en place », « À mon tour »),
+  `scope: "me"` l'applique au seul joueur qui clique, `on: "turnStart"` le lance aussi au début de
+  chaque tour, `params` demande un nombre au joueur (`{ "id": "n", "name": "Combien ?", "min": 1,
+  "max": 10, "default": 1 }`). L'onglet « Scripts et mise en place » de l'éditeur les construit.
+- `unboxing: false` supprime la boîte scellée à déballer avant la première partie ; `name` sur un
+  paquet est le nom affiché sur son emballage.
 
 ## Contenus et droits
 

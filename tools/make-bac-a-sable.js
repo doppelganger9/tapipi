@@ -38,7 +38,7 @@ const def = {
   ],
   rules: "Aucune règle : ce jeu montre ce que le format permet.\n\nDans le fichier, chaque composant a une forme (shape : card, square, round), une taille (size : 1 = une carte standard, 4.6 = ce plateau) et un format (ratio = hauteur / largeur). « fixed » le visse à la table.",
   table: { color: '#3d3226' },
-  decks: { plateau: { cards: boardDeck }, materiel: { back: { color: '#4a5562', label: '◆' }, cards } },
+  decks: { plateau: { name: 'Le plateau', cards: boardDeck }, materiel: { name: 'Pions, tuiles et cartes', back: { color: '#4a5562', label: '◆' }, cards } },
   zones: [
     { id: 'plateau', name: 'Plateau', layout: 'free' },
     { id: 'reserve', name: 'Réserve', layout: 'row' },

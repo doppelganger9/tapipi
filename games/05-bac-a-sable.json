@@ -20,6 +20,7 @@
   },
   "decks": {
     "plateau": {
+      "name": "Le plateau",
       "cards": [
         {
           "id": "plateau",
@@ -32,6 +33,7 @@
       ]
     },
     "materiel": {
+      "name": "Pions, tuiles et cartes",
       "back": {
         "color": "#4a5562",
         "label": "◆"

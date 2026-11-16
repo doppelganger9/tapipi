@@ -23,7 +23,10 @@ function refuse(message) {
 // ---------------------------------------------------------------- state
 
 export function createGame(def, seed = Date.now()) {
-  return clearTable({ def, rng: seed >>> 0, activeSeats: [], seatNames: [], events: [] });
+  const state = clearTable({ def, rng: seed >>> 0, activeSeats: [], seatNames: [], events: [] });
+  // A new game comes in its box: the table stays empty until every pack is opened.
+  state.box = def.unboxing ? { open: false, done: false, packs: Object.fromEntries(Object.keys(def.decks).map((id) => [id, 'sealed'])) } : null;
+  return state;
 }
 
 function clearTable(state) {
@@ -147,26 +150,37 @@ function topCards(state, key, count) {
   return cards.slice(Math.max(0, cards.length - count)).reverse();
 }
 
-/** Deals `count` cards (or all of them) from one zone to several, round-robin. */
-function dealRound(state, fromKey, toKeys, count, opts) {
+/**
+ * Deals from one zone to several, round-robin, `by` cards at a time, until each
+ * target has received `count` (or, with 'all', until the source is empty).
+ */
+function dealRound(state, fromKey, toKeys, count, opts, by = 1) {
   let moved = 0;
-  const rounds = count === 'all' ? Infinity : count;
-  for (let round = 0; round < rounds; round++) {
-    for (const toKey of toKeys) {
-      const [card] = topCards(state, fromKey, 1);
-      if (!card) return moved;
-      place(state, card, toKey, opts);
-      moved++;
+  const given = toKeys.map(() => 0);
+  for (;;) {
+    let progressed = false;
+    for (let i = 0; i < toKeys.length; i++) {
+      const batch = count === 'all' ? by : Math.min(by, count - given[i]);
+      for (let n = 0; n < batch; n++) {
+        const [card] = topCards(state, fromKey, 1);
+        if (!card) return moved;
+        place(state, card, toKeys[i], opts);
+        given[i]++;
+        moved++;
+        progressed = true;
+      }
     }
+    if (!progressed) return moved;
   }
-  return moved;
 }
 
 // ---------------------------------------------------------------- steps
 
-function runSteps(state, steps) {
+/** `ctx.seats`: the players a script applies to; `ctx.args`: its parameter values. */
+function runSteps(state, steps, ctx = {}) {
   const { def } = state;
-  const keys = (zoneId) => keysFor(findZone(def, zoneId), state.activeSeats);
+  const seats = ctx.seats ?? state.activeSeats;
+  const keys = (zoneId) => keysFor(findZone(def, zoneId), seats);
   for (const step of steps) {
     switch (step.op) {
       case 'spawn':
@@ -179,9 +193,11 @@ function runSteps(state, steps) {
         const from = keys(step.from);
         const to = keys(step.to);
         const opts = { faceUp: step.faceUp };
-        if (findZone(def, step.from).owner === 'table') dealRound(state, from[0], to, step.count, opts);
+        const count = typeof step.count === 'string' && step.count.startsWith('$') ? ctx.args?.[step.count.slice(1)] ?? 1 : step.count;
+        if (count === 0) break;
+        if (findZone(def, step.from).owner === 'table') dealRound(state, from[0], to, count, opts, step.by);
         // From player zones: each player to their own target, or all to the shared one.
-        else from.forEach((key, i) => to.length && dealRound(state, key, [to[to.length === 1 ? 0 : i]], step.count, opts));
+        else from.forEach((key, i) => to.length && dealRound(state, key, [to[to.length === 1 ? 0 : i]], count, opts, step.by));
         break;
       }
       case 'gather': {
@@ -232,6 +248,7 @@ function describe(state, names) {
   return `${names.length} cartes`;
 }
 
+const defaultArgs = (macro) => Object.fromEntries(macro.params.map((p) => [p.id, p.default]));
 const protoName = (state, card) => state.def.protos[card.proto].name;
 const plural = (n, word) => `${n} ${word}${n > 1 ? 's' : ''}`;
 
@@ -247,8 +264,9 @@ const handlers = {
       place(state, card, action.to, {
         faceUp: action.faceUp,
         index: Number.isInteger(action.index) ? action.index + i : undefined,
-        x: typeof action.x === 'number' ? action.x + i * 0.03 : undefined,
-        y: typeof action.y === 'number' ? action.y + i * 0.03 : undefined,
+        // `stack` drops the cards exactly on top of each other: a pile.
+        x: typeof action.x === 'number' ? action.x + (action.stack ? 0 : i * 0.03) : undefined,
+        y: typeof action.y === 'number' ? action.y + (action.stack ? 0 : i * 0.03) : undefined,
       });
       if (previous !== action.to) {
         sources.add(previous);
@@ -276,9 +294,14 @@ const handlers = {
     const target = findZone(state.def, action.to);
     if (!target || target.owner !== 'player') refuse('On ne distribue que vers une zone de joueur.');
     const each = count(action.count, 100);
-    const toKeys = keysFor(target, state.activeSeats).filter((key) => key !== action.from);
-    const moved = dealRound(state, action.from, toKeys, each, {});
-    emit(state, seat, `distribue ${plural(each, 'carte')} à chacun depuis ${zoneLabel(state, action.from)} (${moved} au total)`);
+    const by = action.by == null ? 1 : count(action.by, 20);
+    // To everyone by default, or to the listed players only.
+    const seats = Array.isArray(action.seats) ? state.activeSeats.filter((s) => action.seats.includes(s)) : state.activeSeats;
+    if (!seats.length) refuse('Personne à qui distribuer.');
+    const toKeys = keysFor(target, seats).filter((key) => key !== action.from);
+    const moved = dealRound(state, action.from, toKeys, each, {}, by);
+    const whom = seats.length === state.activeSeats.length ? 'à chacun' : `à ${seats.map((s) => seatName(state, s)).join(', ')}`;
+    emit(state, seat, `distribue ${plural(each, 'carte')} ${whom} depuis ${zoneLabel(state, action.from)} (${moved} au total)`);
   },
 
   flip(state, seat, action) {
@@ -311,7 +334,51 @@ const handlers = {
   shuffle(state, seat, action) {
     zoneOf(state, action.zone);
     shuffleZone(state, action.zone);
-    emit(state, seat, `mélange ${zoneLabel(state, action.zone)}`);
+    emit(state, seat, `mélange ${zoneLabel(state, action.zone)}`, { kind: 'shuffle', zone: action.zone });
+  },
+
+  /** Shuffles a hand-picked packet in place: same spots, unknown order, fresh ids. */
+  shuffleCards(state, seat, action) {
+    const cards = cardsOf(state, action.cards);
+    if (cards.length < 2) refuse('Il faut au moins deux cartes à mélanger.');
+    const key = cards[0].zone;
+    if (cards.some((card) => card.zone !== key)) refuse('Rassemblez d’abord ces cartes dans une même zone.');
+    const zone = state.zones[key];
+    const spots = cards.map((card) => ({ at: zone.indexOf(card.id), x: card.x, y: card.y })).sort((a, b) => a.at - b.at);
+    const ids = shuffleInPlace(state, [...cards]).map((card, i) => {
+      delete state.cards[card.id];
+      card.id = `c${state.nextId++}`;
+      card.peek = [];
+      state.cards[card.id] = card;
+      zone[spots[i].at] = card.id;
+      if (spots[i].x !== undefined) Object.assign(card, { x: spots[i].x, y: spots[i].y });
+      delete card.rot;
+      return card.id;
+    });
+    emit(state, seat, `mélange un paquet de ${ids.length} cartes (${zoneLabel(state, key)})`, { kind: 'shuffle', cards: ids });
+  },
+
+  /** Opening the box: the lid first, then each sealed pack; the last one starts the game. */
+  unbox(state, seat, action) {
+    const { box } = state;
+    if (!box || box.done) refuse('La boîte est déjà déballée.');
+    const deckName = (id) => state.def.decks[id].name;
+    if (action.all) {
+      box.open = true;
+      for (const id of Object.keys(box.packs)) box.packs[id] = 'open';
+      emit(state, seat, 'déballe tout le jeu d’un coup', { kind: 'unbox', all: true });
+    } else if (!box.open) {
+      box.open = true;
+      emit(state, seat, 'ouvre la boîte', { kind: 'unbox', lid: true });
+    } else {
+      if (!Object.hasOwn(box.packs, action.deck) || box.packs[action.deck] !== 'sealed') refuse('Ce paquet est déjà ouvert.');
+      box.packs[action.deck] = 'open';
+      emit(state, seat, `déballe « ${deckName(action.deck)} »`, { kind: 'unbox', deck: action.deck });
+    }
+    if (Object.values(box.packs).every((status) => status === 'open')) {
+      box.done = true;
+      setup(state);
+    }
   },
 
   counter(state, seat, action) {
@@ -340,6 +407,11 @@ const handlers = {
     if (!seats.length) return;
     state.turn = seats[(seats.indexOf(state.turn) + 1) % seats.length];
     emit(state, seat, `termine son tour — à ${seatName(state, state.turn)} de jouer`);
+    // Scripts bound to the start of a turn run for the player whose turn begins.
+    for (const macro of state.def.macros.filter((m) => m.on === 'turnStart')) {
+      runSteps(state, macro.steps, { seats: macro.scope === 'me' ? [state.turn] : seats, args: defaultArgs(macro) });
+      emit(state, state.turn, `déclenche « ${macro.name} »`);
+    }
   },
 
   // ---- mischief: the things one can only do around a real table
@@ -377,7 +449,12 @@ const handlers = {
 
   macro(state, seat, action) {
     const macro = state.def.macros.find((m) => m.id === action.id) ?? refuse('Action de table inconnue.');
-    runSteps(state, macro.steps);
+    const args = defaultArgs(macro);
+    for (const param of macro.params) {
+      const value = action.args?.[param.id];
+      if (Number.isInteger(value)) args[param.id] = Math.min(param.max, Math.max(param.min, value));
+    }
+    runSteps(state, macro.steps, { seats: macro.scope === 'me' ? [seat] : state.activeSeats, args });
     emit(state, seat, `lance « ${macro.name} »`);
   },
 };

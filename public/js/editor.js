@@ -79,6 +79,7 @@ function renderGame() {
   $('g-max').value = game.players.max ?? 4;
   $('g-felt').value = game.table?.color ?? '#1f5c4a';
   $('g-rules').value = game.rules ?? '';
+  $('g-unboxing').checked = game.unboxing !== false;
   fill($('deck'), ...Object.keys(game.decks).map((id) => h('option', { value: id, selected: id === deckId }, id)));
 }
 
@@ -113,8 +114,117 @@ function renderAll() {
   renderGame();
   renderCards();
   renderCard();
+  renderScripts();
   save();
 }
+
+// ------------------------------------------------------------------ scripts
+//
+// A script is a list of steps. "Mise en place" runs at the start of every game;
+// the others are buttons at the table, optionally asking for a number, applying
+// to everyone or only to whoever clicks, and optionally firing at each turn.
+
+const OPS = {
+  spawn: { label: 'Poser un paquet sur la table', fields: ['deck', 'to'] },
+  shuffle: { label: 'Mélanger', fields: ['zone'] },
+  move: { label: 'Distribuer / déplacer', fields: ['from', 'to', 'count', 'by'] },
+  gather: { label: 'Tout ramasser vers', fields: ['to'] },
+  flip: { label: 'Retourner tout', fields: ['zone', 'faceUp'] },
+  setCounter: { label: 'Régler un compteur', fields: ['counter', 'value'] },
+};
+const FIELD_LABELS = { deck: 'paquet', to: 'vers', from: 'depuis', zone: 'zone', count: 'combien', by: 'par paquets de', counter: 'compteur', value: 'valeur' };
+
+function choices(field) {
+  if (field === 'deck') return Object.keys(game.decks).map((id) => [id, game.decks[id].name ?? id]);
+  if (field === 'counter') return (game.counters ?? []).map((c) => [c.id, c.name ?? c.id]);
+  return (game.zones ?? []).map((z) => [z.id, `${z.name ?? z.id}${z.owner === 'player' ? ' (chaque joueur)' : ''}`]);
+}
+
+function fieldEl(step, field, script) {
+  const set = (value) => { value === undefined ? delete step[field] : (step[field] = value); save(); };
+  if (field === 'faceUp') {
+    return h('label', { class: 'check' }, h('input', { type: 'checkbox', checked: step.faceUp !== false, onchange: (e) => set(e.target.checked) }), 'face visible');
+  }
+  if (field === 'count') {
+    const param = script?.params?.[0];
+    const parse = (text) => (/^\$/.test(text) ? text : /^\d+$/.test(text) ? Number(text) : 'all');
+    return h('label', {}, param ? `combien (ou $${param.id})` : FIELD_LABELS.count,
+      h('input', { type: 'text', placeholder: 'tout', value: step.count === 'all' || step.count == null ? '' : String(step.count), oninput: (e) => set(parse(e.target.value.trim())) }));
+  }
+  if (field === 'by' || field === 'value') {
+    return h('label', {}, FIELD_LABELS[field], h('input', { type: 'number', min: field === 'by' ? 1 : undefined, value: step[field] ?? '', placeholder: field === 'by' ? '1' : '0',
+      oninput: (e) => set(e.target.value === '' ? undefined : Number(e.target.value)) }));
+  }
+  const options = choices(field);
+  if (!options.some(([id]) => id === step[field])) {
+    // A sensible first guess: cards usually go from the table to the players.
+    const toPlayers = field === 'to' && step.op === 'move' && (game.zones ?? []).find((z) => z.owner === 'player');
+    step[field] = toPlayers ? toPlayers.id : options[0]?.[0];
+  }
+  return h('label', {}, FIELD_LABELS[field], h('select', { onchange: (e) => set(e.target.value) }, options.map(([id, name]) => h('option', { value: id, selected: id === step[field] }, name))));
+}
+
+function stepsEl(steps, script) {
+  const setup = !script;
+  const change = (mutate) => () => { mutate(); renderScripts(); save(); };
+  return [
+    steps.map((step, i) => {
+      if (step.op === 'deal') step.op = 'move'; // two names for the same operation
+      return h('div', { class: 'step' },
+        h('b', {}, `${i + 1}.`),
+        h('label', {}, 'action', h('select', { onchange: (e) => { steps[i] = { op: e.target.value, ...(e.target.value === 'move' ? { count: 1 } : {}) }; renderScripts(); save(); } },
+          Object.entries(OPS).filter(([op]) => setup || op !== 'spawn').map(([op, { label }]) => h('option', { value: op, selected: op === step.op }, label)))),
+        (OPS[step.op]?.fields ?? []).map((field) => fieldEl(step, field, script)),
+        i > 0 && h('button', { class: 'x', type: 'button', title: 'Monter', onclick: change(() => steps.splice(i - 1, 2, steps[i], steps[i - 1])) }, '↑'),
+        h('button', { class: i > 0 ? '' : 'x', type: 'button', title: 'Supprimer cette étape', onclick: change(() => steps.splice(i, 1)) }, '✕'));
+    }),
+    h('div', { class: 'foot' }, h('button', { type: 'button', onclick: change(() => steps.push({ op: 'move', count: 1 })) }, '+ Étape')),
+  ];
+}
+
+function scriptEl(macro, i) {
+  const param = macro.params?.[0];
+  const input = (label, key, attrs = {}) => h('label', {}, label, h('input', { value: macro[key] ?? '', oninput: (e) => { macro[key] = e.target.value; save(); }, ...attrs }));
+  const pick = (label, key, options) => h('label', {}, label, h('select', { onchange: (e) => { e.target.value ? (macro[key] = e.target.value) : delete macro[key]; save(); } },
+    options.map(([value, text]) => h('option', { value, selected: (macro[key] ?? '') === value }, text))));
+  return h('fieldset', { class: 'script' }, h('legend', {}, macro.name || 'Script'),
+    h('div', { class: 'meta' },
+      input('Nom du bouton', 'name', { maxLength: 40 }),
+      input('Phase (regroupe les boutons)', 'group', { maxLength: 30, placeholder: 'Mise en place, À mon tour…', list: 'phases' }),
+      pick('S’applique', 'scope', [['', 'à tous les joueurs'], ['me', 'au joueur qui le lance']]),
+      pick('Se lance', 'on', [['', 'à la demande'], ['turnStart', 'aussi au début de chaque tour']])),
+    h('label', { class: 'check' }, h('input', { type: 'checkbox', checked: Boolean(param), onchange: (e) => {
+      e.target.checked ? (macro.params = [{ id: 'n', name: 'Combien ?', min: 1, max: 20, default: 1 }]) : delete macro.params;
+      renderScripts(); save();
+    } }), 'Demander un nombre au joueur (à utiliser dans « combien » avec $n)'),
+    param && h('div', { class: 'meta' },
+      h('label', {}, 'Question posée', h('input', { value: param.name ?? '', maxLength: 30, oninput: (e) => { param.name = e.target.value; save(); } })),
+      h('label', {}, 'Valeur proposée', h('input', { type: 'number', min: 1, max: 20, value: param.default ?? 1, oninput: (e) => { param.default = Number(e.target.value) || 1; save(); } }))),
+    stepsEl((macro.steps ??= []), macro),
+    h('div', { class: 'foot' }, h('button', { type: 'button', onclick: () => { game.macros.splice(i, 1); renderScripts(); save(); } }, 'Supprimer ce script')));
+}
+
+function renderScripts() {
+  game.setup ??= [];
+  game.macros ??= [];
+  fill($('scriptsView'),
+    h('datalist', { id: 'phases' }, ['Mise en place', 'À mon tour', 'Fin de manche'].map((value) => h('option', { value }))),
+    h('fieldset', { class: 'script' }, h('legend', {}, 'Mise en place — au début de chaque partie'), stepsEl(game.setup, null)),
+    game.macros.map(scriptEl),
+    h('button', { class: 'primary', type: 'button', onclick: () => {
+      game.macros.push({ id: `script-${Date.now().toString(36)}`, name: 'Nouveau script', group: 'À mon tour', steps: [{ op: 'move', count: 1 }] });
+      renderScripts(); save();
+    } }, '+ Script'));
+}
+
+for (const [tab, view, other, otherView] of [['tabCards', 'cardsView', 'tabScripts', 'scriptsView'], ['tabScripts', 'scriptsView', 'tabCards', 'cardsView']]) {
+  $(tab).addEventListener('click', () => {
+    $(tab).classList.add('on'); $(other).classList.remove('on');
+    $(view).hidden = false; $(otherView).hidden = true;
+    if (view === 'scriptsView') renderScripts();
+  });
+}
+$('g-unboxing').addEventListener('change', (event) => { event.target.checked ? delete game.unboxing : (game.unboxing = false); save(); });
 
 // ------------------------------------------------------------------ editing
 

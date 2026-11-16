@@ -17,7 +17,8 @@
       "back": {
         "color": "#7a1f2b",
         "label": "❖"
-      }
+      },
+      "name": "Jeu de 52 cartes"
     }
   },
   "zones": [
@@ -80,6 +81,28 @@
   ],
   "macros": [
     {
+      "id": "donner",
+      "name": "Distribuer…",
+      "group": "Mise en place",
+      "params": [
+        {
+          "id": "n",
+          "name": "Cartes par joueur",
+          "min": 1,
+          "max": 26,
+          "default": 5
+        }
+      ],
+      "steps": [
+        {
+          "op": "deal",
+          "from": "pioche",
+          "to": "main",
+          "count": "$n"
+        }
+      ]
+    },
+    {
       "id": "ramasser",
       "name": "Tout ramasser et mélanger",
       "steps": [
@@ -91,31 +114,8 @@
           "op": "shuffle",
           "zone": "pioche"
         }
-      ]
-    },
-    {
-      "id": "donne5",
-      "name": "Distribuer 5 cartes à chacun",
-      "steps": [
-        {
-          "op": "deal",
-          "from": "pioche",
-          "to": "main",
-          "count": 5
-        }
-      ]
-    },
-    {
-      "id": "donne7",
-      "name": "Distribuer 7 cartes à chacun",
-      "steps": [
-        {
-          "op": "deal",
-          "from": "pioche",
-          "to": "main",
-          "count": 7
-        }
-      ]
+      ],
+      "group": "Mise en place"
     },
     {
       "id": "donneTout",
@@ -126,6 +126,30 @@
           "from": "pioche",
           "to": "main",
           "count": "all"
+        }
+      ],
+      "group": "Mise en place"
+    },
+    {
+      "id": "piocher",
+      "name": "Piocher…",
+      "group": "À mon tour",
+      "scope": "me",
+      "params": [
+        {
+          "id": "n",
+          "name": "Cartes à piocher",
+          "min": 1,
+          "max": 10,
+          "default": 1
+        }
+      ],
+      "steps": [
+        {
+          "op": "move",
+          "from": "pioche",
+          "to": "main",
+          "count": "$n"
         }
       ]
     }

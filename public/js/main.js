@@ -11,6 +11,8 @@ const S = { def: null, view: null, players: [], you: -1, host: -1 };
 let session = JSON.parse(sessionStorage.getItem('tapis:session') ?? 'null'); // { room, token }
 let iOpenedThisTable = false;
 let welcomePending = false;
+let coachWanted = false; // start the tutorial as soon as there is a table to learn on
+let queuedFx = null; // an effect that must play on the state that follows it
 
 const store = {
   get: (key) => { try { return localStorage.getItem(key); } catch { return null; } },
@@ -29,6 +31,7 @@ const table = createTable({
   root: $('table'), bar: $('bar'), menu: $('menu'),
   send: (message) => connection.send(message),
   onHover: (card) => fill($('preview'), cardEl(S.def, { p: card.p, up: true }, { detailed: true })),
+  onDeal: openDeal,
 });
 
 const coach = createCoach({ el: $('coach'), onFinish: () => store.set('tapis:coached', '1') });
@@ -61,10 +64,14 @@ function receive(message) {
     case 'state':
       Object.assign(S, { view: message.view, players: message.players, you: message.you, host: message.host });
       document.body.classList.toggle('is-host', S.you >= 0 && S.you === S.host);
-      table.update(S);
+      table.update(S, queuedFx);
+      queuedFx = null;
       renderSidebar();
       renderGuests();
-      coach.update(S);
+      if (coachWanted && !(S.view.box && !S.view.box.done) && !$('welcomeDlg').open) {
+        coachWanted = false;
+        coach.start(S);
+      } else coach.update(S);
       if (welcomePending) {
         welcomePending = false;
         openWelcome(true);
@@ -73,7 +80,9 @@ function receive(message) {
     case 'log':
       if (message.replace) fill($('log'));
       for (const entry of message.entries) appendLog(entry);
-      if (message.fx) playEffect(message.fx);
+      // Shuffles and unboxing animate the new table, which arrives right after.
+      if (message.fx?.kind === 'shuffle' || message.fx?.kind === 'unbox') queuedFx = message.fx;
+      else if (message.fx) playEffect(message.fx);
       break;
     case 'error':
       toast(message.text);
@@ -207,12 +216,16 @@ $('wCopy').addEventListener('click', async () => {
 $('wShare').addEventListener('click', () => navigator.share({ title: 'Tapis', text: `Viens jouer à ${S.def.name} !`, url: location.href }).catch(() => {}));
 $('wRules').addEventListener('click', () => $('rulesDlg').showModal());
 $('wGo').addEventListener('click', () => $('welcomeDlg').close());
-$('welcomeDlg').addEventListener('close', () => { if (!store.get('tapis:coached')) coach.start(S); });
+function startCoach() {
+  if (S.view.box && !S.view.box.done) coachWanted = true; // nothing to learn on until the box is open
+  else coach.start(S);
+}
+$('welcomeDlg').addEventListener('close', () => { if (!store.get('tapis:coached')) startCoach(); });
 
 // ------------------------------------------------------------------ top bar
 
 $('share').addEventListener('click', () => openWelcome(false));
-$('helpBtn').addEventListener('click', () => coach.start(S));
+$('helpBtn').addEventListener('click', startCoach);
 $('rulesBtn').addEventListener('click', () => $('rulesDlg').showModal());
 $('restartBtn').addEventListener('click', () => confirm('Ramasser toutes les cartes et recommencer ?') && connection.send({ t: 'restart' }));
 $('changeBtn').addEventListener('click', () => {
@@ -241,6 +254,8 @@ function counterEl(counter, seat) {
     S.you >= 0 && h('button', { onclick: change(1), 'aria-label': `${counter.name} +1` }, '+'));
 }
 
+const groupOf = (macro) => macro.group || 'Actions de table';
+
 function renderSidebar() {
   const perPlayer = S.def.counters.filter((c) => c.scope === 'player');
   const shared = S.def.counters.filter((c) => c.scope === 'table');
@@ -262,13 +277,51 @@ function renderSidebar() {
       button('Fin du tour', { type: 'turn' }, 'primary'),
       button('Dé à 6 faces', { type: 'roll', sides: 6 }),
       button('Pile ou face', { type: 'roll', sides: 2 })),
-    S.def.macros.length && h('div', { class: 'group' }, h('span', { class: 'label' }, 'Actions de table'),
-      S.def.macros.map((m) => button(m.name, { type: 'macro', id: m.id }))),
+    // Scripts, gathered by the phase their author filed them under.
+    [...new Set(S.def.macros.map(groupOf))].map((group) => [group, S.def.macros.filter((m) => groupOf(m) === group)]).map(([group, macros]) => h('div', { class: 'group' },
+      h('span', { class: 'label' }, group),
+      macros.map((m) => h('button', { title: m.on ? 'Se lance aussi tout seul au début de chaque tour' : '', onclick: () => runMacro(m) }, m.name, m.on && ' ⟳')))),
     h('div', { class: 'group' }, h('span', { class: 'label' }, 'Mauvais joueur'),
       button('Renverser la table', { type: 'flipTable' }),
       button('Renverser son café', { type: 'spill' }),
       (S.view.stains ?? []).length > 0 && button('Éponger', { type: 'clean' })),
   );
+}
+
+/** A script with parameters asks for them first. */
+function runMacro(macro) {
+  if (!macro.params.length) return act({ type: 'macro', id: macro.id });
+  $('paramTitle').textContent = macro.name.replace(/…$/, '');
+  fill($('paramFields'), macro.params.map((p) => h('label', {}, p.name,
+    h('input', { name: p.id, type: 'number', min: p.min, max: p.max, value: p.default, required: true }))));
+  $('paramDlg').onclose = () => {
+    if ($('paramDlg').returnValue !== 'ok') return;
+    const args = Object.fromEntries(macro.params.map((p) => [p.id, Number($('paramForm').elements[p.id].value)]));
+    act({ type: 'macro', id: macro.id, args });
+  };
+  $('paramDlg').showModal();
+  $('paramForm').elements[macro.params[0].id].select();
+}
+
+/** Dealing from any zone: how many, to whom, where, and how many at a time. */
+function openDeal(from, title, available) {
+  const form = $('dealForm');
+  $('dealFrom').textContent = `Depuis « ${title} » (${available} carte${available > 1 ? 's' : ''}).`;
+  fill(form.elements.who,
+    h('option', { value: 'all' }, 'À chaque joueur'),
+    h('option', { value: String(S.you) }, 'À moi'),
+    S.players.filter((p) => p.seat !== S.you).map((p) => h('option', { value: String(p.seat) }, `À ${p.name}`)));
+  fill(form.elements.zone, S.def.zones.filter((z) => z.owner === 'player').map((z) => h('option', { value: z.id, selected: z.id === S.def.ui.hand }, z.name)));
+  $('dealDlg').onclose = () => {
+    if ($('dealDlg').returnValue !== 'ok') return;
+    const who = form.elements.who.value;
+    act({
+      type: 'deal', from, to: form.elements.zone.value, count: Number(form.elements.count.value), by: Number(form.elements.by.value) || 1,
+      seats: who === 'all' ? undefined : [Number(who)],
+    });
+  };
+  $('dealDlg').showModal();
+  form.elements.count.select();
 }
 
 function appendLog(entry) {
