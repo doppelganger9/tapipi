@@ -69,6 +69,7 @@ function receive(message) {
     }
     case 'state':
       Object.assign(S, { view: message.view, players: message.players, you: message.you, host: message.host });
+      renderPause(message.pause);
       applyLegacy(message.view.legacy);
       document.body.classList.toggle('is-host', S.you >= 0 && S.you === S.host);
       table.update(S, queuedFx);
@@ -104,6 +105,58 @@ function receive(message) {
       break;
   }
 }
+
+// ------------------------------------------------------------------ break
+
+const PAUSE_IDEAS = [
+  'Faire pipi, donc. C’est dans le nom.', 'Remettre de l’eau à chauffer.', 'Vérifier que le chat n’a pas mangé une carte.', 'S’étirer comme si on avait fait du sport.',
+  'Ouvrir le frigo, le regarder, le refermer.', 'Répondre à ce message qui attend depuis mardi.', 'Aller chercher un pull. Ou l’enlever.', 'Refaire du café. Pour de vrai, cette fois.',
+  'Regarder par la fenêtre d’un air pensif.', 'Compter ses points de tête, pour se rassurer.', 'Préparer une excuse pour la prochaine défaite.', 'Boire un verre d’eau. Un vrai, avec de l’eau.',
+  'Demander « c’est à qui ? » à une pièce vide.', 'Changer de chaise, pour la chance.', 'Se laver les mains : elles ont touché des cartes louches.', 'Dire bonjour aux gens avec qui on vit.',
+];
+let pauseTimer = null;
+
+/** Everybody agrees to a break, then everybody says they are back. */
+function renderPause(pause) {
+  const seated = S.players.filter((p) => p.connected);
+  const names = (seats) => seated.filter((p) => seats.includes(p.seat)).map((p) => p.name).join(', ');
+  const iVoted = pause?.votes.includes(S.you);
+  const playing = S.you >= 0;
+
+  const ask = $('pauseAsk');
+  ask.hidden = pause?.phase !== 'asked';
+  if (!ask.hidden) {
+    fill(ask, h('b', {}, 'Pause pipi ?'), ` ${pause.votes.length}/${seated.length} d’accord (${names(pause.votes)}).`,
+      playing && !iVoted && h('button', { class: 'primary', onclick: () => connection.send({ t: 'pause' }) }, 'D’accord, pause'),
+      playing && h('button', { onclick: () => connection.send({ t: 'pause', cancel: true }) }, iVoted ? 'Annuler' : 'Pas maintenant'));
+  }
+
+  const on = pause?.phase === 'on';
+  const wasOn = !$('pause').hidden;
+  $('pause').hidden = !on;
+  $('pauseBtn').disabled = Boolean(pause) || !playing;
+  clearInterval(pauseTimer);
+  if (!on) return;
+  if (!wasOn) {
+    $('pauseIdea').textContent = PAUSE_IDEAS[Math.floor(Math.random() * PAUSE_IDEAS.length)];
+    for (const dialog of document.querySelectorAll('dialog[open]')) dialog.close();
+  }
+  const started = Date.now() - pause.elapsed;
+  const tick = () => {
+    const s = Math.floor((Date.now() - started) / 1000);
+    $('pauseClock').textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+  };
+  tick();
+  pauseTimer = setInterval(tick, 1000);
+  const missing = seated.filter((p) => !pause.votes.includes(p.seat)).map((p) => p.name);
+  $('pauseWho').textContent = pause.votes.length ? `De retour : ${names(pause.votes)}. On attend ${missing.join(', ')}.` : 'La partie reprend quand tout le monde a cliqué.';
+  $('pauseBack').hidden = !playing;
+  $('pauseBack').disabled = iVoted;
+  $('pauseBack').textContent = iVoted ? 'On attend les autres…' : 'Je suis de retour';
+  if (!wasOn && playing) $('pauseBack').focus();
+}
+$('pauseBtn').addEventListener('click', () => connection.send({ t: 'pause' }));
+$('pauseBack').addEventListener('click', () => connection.send({ t: 'pause' }));
 
 /** Cards written or altered during play are part of the game from then on. */
 function applyLegacy(legacy) {
@@ -251,6 +304,7 @@ $('wCopy').addEventListener('click', async () => {
     $('wCopy').textContent = 'Lien copié ✓';
   } catch {
     $('wLink').select();
+    $('wLink').scrollLeft = $('wLink').scrollWidth;
   }
   setTimeout(() => { $('wCopy').textContent = 'Copier le lien'; }, 2500);
 });

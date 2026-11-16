@@ -82,6 +82,7 @@
       <strong class="brand">Tapipi</strong>
       <span id="gameName"></span>
       <button id="share" class="primary" title="Inviter d'autres joueurs">Inviter</button>
+      <button id="pauseBtn" title="Tout le monde s'arrête, la table est masquée">Pause pipi</button>
       <span id="status" class="status" hidden>Reconnexion…</span>
       <span class="spacer"></span>
       <label class="felt" title="Le papier de votre tapis">Tapis <select id="felt"></select></label>
@@ -104,6 +105,17 @@
     <div id="bar" class="bar" hidden></div>
     <div id="menu" class="menu" hidden></div>
     <div id="coach" class="coach" hidden role="status"></div>
+    <div id="pauseAsk" class="pause-ask" hidden role="status"></div>
+    <div id="pause" class="pause" hidden role="dialog" aria-modal="true" aria-labelledby="pauseTitle">
+      <div class="pause-card">
+        <p class="kicker">Table sous cloche — on ne touche à rien</p>
+        <h2 id="pauseTitle">Pause pipi</h2>
+        <p id="pauseClock" class="pause-clock">0:00</p>
+        <p id="pauseIdea" class="pause-idea"></p>
+        <p id="pauseWho" class="pause-who"></p>
+        <button id="pauseBack" class="primary big">Je suis de retour</button>
+      </div>
+    </div>
   </div>
 
   <dialog id="welcomeDlg" class="welcome">

@@ -237,3 +237,32 @@ test('un jeu qui évolue : cartes marquées et ajoutées survivent à la partie 
   assert.equal(reopened.def.decks[Object.keys(state.def.decks)[0]].list.length, state.def.decks[Object.keys(state.def.decks)[0]].list.length);
   assert.ok(applyAction(state, 0, { type: 'flip', cards: [state.zones[Object.keys(state.zones).find((k) => state.zones[k].length)][0]], faceUp: true }).ok);
 });
+
+test('pause pipi : tout le monde accepte, la table est masquée, tout le monde revient', async () => {
+  const { Room } = await import('../server/room.js');
+  const room = new Room('TEST1', load('02-classique-52.json'));
+  const client = () => { const c = { sent: [], send: (m) => c.sent.push(m) }; return c; };
+  const last = (c) => c.sent.filter((m) => m.t === 'state').at(-1);
+  const a = client(), b = client();
+  room.join(a, 'A'); room.join(b, 'B');
+  room.handle(a, { t: 'act', a: { type: 'unbox', all: true } });
+  const cardsSeen = (c) => Object.values(last(c).view.zones).flat().length;
+  assert.ok(cardsSeen(a) > 50);
+  room.handle(a, { t: 'pause' });
+  assert.equal(last(b).pause.phase, 'asked');
+  assert.ok(cardsSeen(b) > 50, 'la partie continue tant que tous n’ont pas accepté');
+  room.handle(b, { t: 'pause' });
+  assert.equal(last(a).pause.phase, 'on');
+  assert.equal(cardsSeen(a), 0);
+  room.handle(a, { t: 'act', a: { type: 'flipTable' } });
+  assert.match(a.sent.at(-1).text, /Pause/);
+  room.handle(a, { t: 'pause' });
+  assert.equal(last(a).pause.phase, 'on', 'B n’est pas revenu');
+  room.leave(b); // a player who leaves does not block the others
+  assert.equal(last(a).pause, null);
+  assert.ok(cardsSeen(a) > 50);
+  room.handle(a, { t: 'pause' }); // alone: both steps are immediate
+  assert.equal(last(a).pause.phase, 'on');
+  room.handle(a, { t: 'pause' });
+  assert.equal(last(a).pause, null);
+});

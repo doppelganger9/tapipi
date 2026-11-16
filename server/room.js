@@ -18,6 +18,7 @@ export class Room {
     this.seats = [];
     this.log = [];
     this.emptySince = Date.now();
+    this.pause = null; // { phase: 'asked' | 'on', votes: [seats], since }
     this.load(def);
   }
 
@@ -91,7 +92,39 @@ export class Room {
       this.say(null, `${seat.name} s'est déconnecté·e (sa place est gardée).`);
     }
     if (!this.clients.size) this.emptySince = Date.now();
+    this.settlePause(); // nobody waits for someone who left
     this.broadcast();
+  }
+
+  // -------------------------------------------------------------- break
+
+  /**
+   * A break is agreed by everybody, twice: all connected players accept it,
+   * then all of them say they are back. Meanwhile the table is hidden from
+   * everyone and nothing can be played — no peeking while the others are away.
+   */
+  votePause(client) {
+    if (!this.pause) {
+      this.pause = { phase: 'asked', votes: [], since: Date.now() };
+      this.say(client.seat, 'demande une pause pipi.', client.name);
+    }
+    if (!this.pause.votes.includes(client.seat)) this.pause.votes.push(client.seat);
+    this.settlePause();
+  }
+
+  settlePause() {
+    if (!this.pause) return;
+    const present = this.seats.flatMap((seat, i) => (seat?.connected ? [i] : []));
+    if (present.length && !present.every((seat) => this.pause.votes.includes(seat))) return;
+    if (this.pause.phase === 'asked' && present.length) {
+      this.pause = { phase: 'on', votes: [], since: Date.now() };
+      this.say(null, 'Pause pipi ! La table est sous cloche.');
+    } else {
+      const seconds = Math.round((Date.now() - this.pause.since) / 1000);
+      const lasted = this.pause.phase === 'on';
+      this.pause = null;
+      if (lasted) this.say(null, `Tout le monde est revenu : la partie reprend (pause de ${Math.floor(seconds / 60)} min ${String(seconds % 60).padStart(2, '0')}).`);
+    }
   }
 
   // -------------------------------------------------------------- messages
@@ -100,6 +133,7 @@ export class Room {
     switch (message.t) {
       case 'act': {
         if (client.seat < 0) return client.send({ t: 'error', text: 'Les spectateurs ne peuvent pas jouer.' });
+        if (this.pause?.phase === 'on') return client.send({ t: 'error', text: 'Pause en cours : on ne touche à rien.' });
         const result = applyAction(this.state, client.seat, message.a);
         if (result.error) return client.send({ t: 'error', text: result.error });
         if (message.a?.type !== 'unbox') this.pristine = false; // unboxing is not playing yet
@@ -111,6 +145,13 @@ export class Room {
         this.say(client.seat, text, client.name, 'chat');
         return;
       }
+      case 'pause':
+        if (client.seat < 0) return;
+        if (message.cancel && this.pause?.phase === 'asked') {
+          this.pause = null;
+          this.say(client.seat, 'préfère continuer : pas de pause pour l’instant.', client.name);
+        } else if (!message.cancel) this.votePause(client);
+        break;
       case 'save':
         // The game as it is now, to keep as a file and reopen another day.
         return client.send({ t: 'saved', def: exportDefinition(this.def) });
@@ -166,7 +207,11 @@ export class Room {
     const players = this.seats.map((seat, i) => seat && { seat: i, name: seat.name, connected: seat.connected });
     const host = this.hostSeat;
     for (const client of this.clients) {
-      client.send({ t: 'state', view: viewFor(this.state, client.seat), players: players.filter(Boolean), host, you: client.seat });
+      const view = viewFor(this.state, client.seat);
+      // During a break nobody is sent any card, not even their own.
+      if (this.pause?.phase === 'on') view.zones = Object.fromEntries(Object.keys(view.zones).map((key) => [key, []]));
+      const pause = this.pause && { phase: this.pause.phase, votes: this.pause.votes, elapsed: Date.now() - this.pause.since };
+      client.send({ t: 'state', view, players: players.filter(Boolean), host, you: client.seat, pause });
     }
   }
 }

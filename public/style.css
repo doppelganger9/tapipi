@@ -195,9 +195,6 @@ button.big { font: 400 1.7rem var(--display); padding: .7rem 1.2rem; min-height:
   background-size: 40px 40px;
   touch-action: pan-y;
 }
-/* Somebody's mug was here before the game started. */
-#table::before { content: ""; position: absolute; right: 7%; top: 44%; width: 170px; height: 164px; pointer-events: none; mix-blend-mode: multiply; rotate: 30deg;
-  border: 8px solid rgb(104 58 22 / .22); border-radius: 49% 51% 52% 48% / 52% 48% 51% 49%; box-shadow: inset 0 0 0 2px rgb(104 58 22 / .1); }
 .opponents { display: flex; gap: 10px; flex-wrap: wrap; }
 .opponents .area { flex: 1 1 260px; --cw: 52px; }
 .area { padding: 6px 8px 8px; background: rgb(11 11 11 / .07); border: 3px solid var(--black); position: relative; }
@@ -232,8 +229,9 @@ button.big { font: 400 1.7rem var(--display); padding: .7rem 1.2rem; min-height:
 .zcards.free { position: relative; isolation: isolate; min-height: calc(var(--cw) * 3.3); background-size: contain; background-repeat: no-repeat; background-position: center; }
 .zcards.free > .card { position: absolute; left: calc(var(--x) * (100% - var(--cw) * var(--s, 1))); top: calc(var(--y) * (100% - var(--cw) * var(--s, 1) * var(--r, 1.4))); }
 .empty { width: var(--cw); height: calc(var(--cw) * 1.4); border: 3px dashed rgb(11 11 11 / .3); rotate: 2deg; }
-.stain { position: absolute; width: 150px; height: 138px; pointer-events: none; mix-blend-mode: multiply; border-radius: 47% 53% 60% 40% / 55% 42% 58% 45%;
-  background: rgb(104 58 22 / .3); border: 9px solid rgb(104 58 22 / .5); animation: spill .5s steps(5); }
+/* Spilled coffee: a pale puddle with the dark rim it leaves as it dries, and what splashed around. */
+.stain { position: absolute; width: 230px; height: 190px; pointer-events: none; mix-blend-mode: multiply; animation: spill .6s ease-out;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 230 190'%3E%3Cfilter id='w' x='-10%25' y='-10%25' width='120%25' height='120%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.022' numOctaves='3' seed='11'/%3E%3CfeDisplacementMap in='SourceGraphic' scale='26'/%3E%3C/filter%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.5' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .16 0 0 0 0 .05 0 0 0 .5 -.12'/%3E%3CfeComposite in2='SourceGraphic' operator='in'/%3E%3C/filter%3E%3Cg filter='url(%23w)'%3E%3Cellipse cx='108' cy='96' rx='74' ry='58' fill='%236a3a14' fill-opacity='.2'/%3E%3Cellipse cx='108' cy='96' rx='74' ry='58' fill='none' stroke='%234a2408' stroke-opacity='.6' stroke-width='4'/%3E%3Cellipse cx='106' cy='95' rx='66' ry='50' fill='none' stroke='%236a3a14' stroke-opacity='.22' stroke-width='7'/%3E%3Cellipse cx='96' cy='104' rx='40' ry='28' fill='%236a3a14' fill-opacity='.12'/%3E%3Cellipse cx='176' cy='140' rx='15' ry='11' fill='%236a3a14' fill-opacity='.22' stroke='%234a2408' stroke-opacity='.55' stroke-width='2.5'/%3E%3Ccircle cx='200' cy='58' r='6' fill='%236a3a14' fill-opacity='.3' stroke='%234a2408' stroke-opacity='.5' stroke-width='2'/%3E%3Ccircle cx='30' cy='150' r='4.5' fill='%234a2408' fill-opacity='.4'/%3E%3Ccircle cx='212' cy='96' r='2.5' fill='%234a2408' fill-opacity='.45'/%3E%3Ccircle cx='24' cy='40' r='3' fill='%234a2408' fill-opacity='.4'/%3E%3Ccircle cx='150' cy='22' r='2' fill='%234a2408' fill-opacity='.45'/%3E%3C/g%3E%3Cellipse cx='108' cy='96' rx='70' ry='54' filter='url(%23g)' opacity='.5'/%3E%3C/svg%3E") center / contain no-repeat; }
 @keyframes spill { from { scale: .1; opacity: 0; } }
 
 /* ------------------------------------------------------------ cards */
@@ -447,3 +445,34 @@ button.pack:hover:not(:disabled), button.sheet:hover:not(:disabled) { border: 0;
 .shelf .game strong { font-size: 1.9rem; flex-basis: 260px; }
 .shelf .game { padding-top: 12px; padding-bottom: 12px; }
 #picker2 { max-height: 60vh; overflow-y: auto; }
+
+/* ------------------------------------------------------------ preview that can be read */
+.preview { padding: 18px 0; }
+.preview .card { height: auto; min-height: calc(var(--cw) * var(--s, 1) * var(--r, 1.4)); }
+.preview .card .face.custom { position: relative; min-height: inherit; }
+.preview .card .custom .art { flex: 1 0 auto; min-height: 1.7em; padding: .12em 0; }
+.preview .card .custom .type { white-space: normal; }
+.preview .card .custom .text { font-size: .68em; flex: none; padding-bottom: 1.6em; }
+.card { min-height: 0; }
+.custom .art { overflow: hidden; }
+
+/* ------------------------------------------------------------ invite link */
+.invitebox .inline { flex-wrap: wrap; gap: 6px; }
+.invitebox .inline > * + * { margin-left: 0; }
+#wLink { flex: 1 1 100%; font: 700 .8rem var(--mono); padding: .6rem; }
+.invitebox .inline button { flex: 1; }
+
+/* ------------------------------------------------------------ break */
+.pause-ask { position: fixed; left: 50%; top: 58px; translate: -50%; z-index: 80; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; max-width: calc(100vw - 20px);
+  background: var(--yellow); border: 4px solid var(--black); box-shadow: 8px 8px 0 var(--black); padding: 8px 12px; rotate: -.8deg; font-weight: 600; }
+.pause-ask b { font: 400 1.5rem var(--display); text-transform: uppercase; }
+.pause { position: fixed; inset: 0; z-index: 900; display: grid; place-items: center; padding: 16px;
+  background-color: var(--yellow); background-image: repeating-linear-gradient(-45deg, var(--black) 0 34px, transparent 34px 68px); }
+.pause-card { width: min(560px, 100%); background: var(--paper); border: 6px solid var(--black); box-shadow: 16px 16px 0 var(--black); padding: 26px 28px 30px; rotate: -1.5deg; text-align: center; }
+.pause-card h2 { font-size: clamp(64px, 16vw, 130px); line-height: .85; margin: 10px 0 0; text-shadow: 4px 3px 0 var(--red); }
+.pause-clock { font: 700 3rem var(--mono); margin: 12px 0 4px; }
+.pause-idea { font-size: 1.35rem; font-weight: 800; line-height: 1.2; margin: 10px auto 16px; max-width: 420px; background: var(--yellow); padding: 8px 12px; rotate: 1.2deg; border: 3px solid var(--black); }
+.pause-idea::before { content: "Idée : "; font: 700 .75rem var(--mono); text-transform: uppercase; display: block; }
+.pause-who { font: 400 .85rem var(--mono); min-height: 2.6em; }
+.pause-card .big { width: 100%; background: var(--black); color: var(--yellow); }
+.pause-card .big:hover:not(:disabled) { background: var(--red) !important; color: var(--black) !important; }
