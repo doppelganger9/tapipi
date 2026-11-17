@@ -244,7 +244,7 @@
           "name": "Bol de chips",
           "type": "Accessoire",
           "cost": "1",
-          "art": ":champignon",
+          "art": ":chips",
           "color": "#1f4e79",
           "count": 2,
           "text": "Reste sur votre table. Au début de votre tour, piochez une carte de plus."
@@ -274,7 +274,7 @@
           "name": "Chronomètre",
           "type": "Accessoire",
           "cost": "2",
-          "art": ":coeur",
+          "art": ":chrono",
           "color": "#1f4e79",
           "count": 1,
           "text": "Reste sur votre table. L’adversaire a trente secondes par tour. S’il dépasse : −1 Moral. Comptez à voix haute, c’est plus pénible."

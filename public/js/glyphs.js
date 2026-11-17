@@ -9,6 +9,8 @@ const L = 'fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="sq
 const LP = 'fill="none" stroke="var(--paper, #F1ECDF)" stroke-width="6"';
 
 export const GLYPHS = {
+  chips: `<path d="M6 52H94Q92 80 68 90H32Q8 80 6 52Z"/><path d="M14 46Q12 24 34 20 44 32 40 46ZM40 46Q40 16 62 8 72 26 62 46ZM62 46Q70 26 88 26 92 38 84 46Z"/><path d="M22 66H78" ${LP}/>`,
+  chrono: `<path d="M40 2H60V12H40ZM76 14 88 26 81 33 69 21Z"/><circle cx="50" cy="56" r="40"/><circle cx="50" cy="56" r="27" ${P}/><path d="M50 56V36M50 56 64 66" ${L}/>`,
   champignon: `<path d="M8 52Q10 12 50 12 92 14 92 52Z"/><path d="M38 52 34 90 68 88 62 52Z"/><circle cx="34" cy="34" r="7" ${P}/><circle cx="62" cy="28" r="5" ${P}/><circle cx="70" cy="42" r="4" ${P}/>`,
   lune: '<path d="M62 8A42 42 0 1 0 92 66 34 34 0 1 1 62 8Z"/>',
   flamme: '<path d="M50 6Q78 34 74 60 72 94 48 94 22 92 24 62 26 44 38 36 40 52 50 50 44 28 50 6Z"/>',

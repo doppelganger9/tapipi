@@ -32,10 +32,10 @@ const tricks = [
   ['table', 'Renverser la table', 3, 'crane', 1, 'Tous les Joueurs de toutes les tables sont défaussés. Cliquez sur le bouton, vous en mourez d’envie.'],
 ];
 const props = [
-  ['chips', 'Bol de chips', 1, 'champignon', 2, 'Reste sur votre table. Au début de votre tour, piochez une carte de plus.'],
+  ['chips', 'Bol de chips', 1, 'chips', 2, 'Reste sur votre table. Au début de votre tour, piochez une carte de plus.'],
   ['tapis', 'Tapis de jeu', 2, 'sapin', 1, 'Reste sur votre table. Vos Joueurs ont +1 Sang-froid.'],
   ['de-pipe', 'Dé pipé', 1, 'de', 1, 'Reste sur votre table. Une fois par tour, relancez un dé que vous venez de lancer.'],
-  ['chrono', 'Chronomètre', 2, 'coeur', 1, 'Reste sur votre table. L’adversaire a trente secondes par tour. S’il dépasse : −1 Moral. Comptez à voix haute, c’est plus pénible.'],
+  ['chrono', 'Chronomètre', 2, 'chrono', 1, 'Reste sur votre table. L’adversaire a trente secondes par tour. S’il dépasse : −1 Moral. Comptez à voix haute, c’est plus pénible.'],
 ];
 
 const cards = [
