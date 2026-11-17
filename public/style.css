@@ -269,7 +269,7 @@ button.big { font: 400 1.7rem var(--display); padding: .7rem 1.2rem; min-height:
 
 .face.custom { display: flex; flex-direction: column; }
 .custom .head { display: flex; justify-content: space-between; align-items: center; gap: .3em; background: var(--accent); color: #fff; padding: .15em .35em .2em; font: 400 1.05em/1.1 var(--display); text-transform: uppercase; border-bottom: 3px solid var(--black); }
-.custom .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.custom .name { flex: 1; min-width: 0; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; line-height: 1.2; }
 .custom .cost { flex: none; background: var(--paper); color: var(--black); border: 2px solid var(--black); min-width: 1.4em; text-align: center; font-size: 1em; rotate: 5deg; }
 .art { flex: 1; min-height: 0; display: grid; place-items: center; font: 400 3em/1 var(--display); color: var(--accent); }
 .art.long { font-size: 2.1em; }
@@ -436,8 +436,14 @@ button.pack:hover:not(:disabled), button.sheet:hover:not(:disabled) { border: 0;
 /* ------------------------------------------------------------ catalogue */
 .search { width: 100%; font: 700 1.1rem var(--mono); padding: 16px; border-width: 4px; margin-bottom: 10px; }
 .search::placeholder { color: var(--muted); }
-.shelf { counter-reset: game; margin-top: 34px; display: grid; }
-.shelf h3 { justify-self: start; }
+.shelf { counter-reset: game; margin-top: 22px; }
+.shelf-body { display: grid; }
+.shelf summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 14px; min-height: 44px; }
+.shelf summary::-webkit-details-marker { display: none; }
+.shelf summary::after { content: '+ ouvrir'; font: 700 .8rem var(--mono); text-transform: uppercase; border-bottom: 2px solid var(--black); }
+.shelf[open] summary::after { content: '− replier'; }
+.shelf summary:hover h3 { background: var(--yellow); color: var(--black); }
+.shelf summary:hover h3 small { color: var(--black); }
 .shelf h3 { display: inline-block; font-size: 2rem; background: var(--black); color: var(--paper); padding: 4px 12px 6px; rotate: -1.2deg; margin-bottom: 4px; }
 .shelf:nth-of-type(even) h3 { rotate: 1deg; background: var(--red); color: var(--black); }
 .shelf h3 small { font: 700 .8rem var(--mono); color: var(--yellow); vertical-align: top; }
@@ -476,4 +482,4 @@ button.pack:hover:not(:disabled), button.sheet:hover:not(:disabled) { border: 0;
 .pause-who { font: 400 .85rem var(--mono); min-height: 2.6em; }
 .pause-card .big { width: 100%; background: var(--black); color: var(--yellow); }
 .pause-card .big:hover:not(:disabled) { background: var(--red) !important; color: var(--black) !important; }
-.preview .card .custom .name { white-space: normal; }
+.preview .card .custom .name { -webkit-line-clamp: 4; line-clamp: 4; }

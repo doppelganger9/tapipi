@@ -31,13 +31,35 @@ function faceEl(proto, detailed) {
   }
   face.classList.add('custom');
   fill(face,
-    h('div', { class: 'head' }, h('span', { class: 'name' }, proto.name), proto.cost && h('span', { class: 'cost' }, proto.cost)),
+    h('div', { class: 'head' }, fitName(h('span', { class: 'name' }, proto.name), detailed), proto.cost && h('span', { class: 'cost' }, proto.cost)),
     artEl(proto),
     proto.type && h('div', { class: 'type' }, proto.type),
     detailed && proto.text && h('div', { class: 'text' }, proto.text),
     proto.stats && h('div', { class: 'stats' }, proto.stats),
   );
   return face;
+}
+
+// A title never gets cut: it wraps on two lines, then shrinks until it fits.
+const fitted = new Map();
+function fitName(el, detailed) {
+  if (detailed) return el; // the large preview has room for any title
+  requestAnimationFrame(() => {
+    if (!el.isConnected || !el.clientWidth) return;
+    const key = `${el.textContent}|${el.clientWidth}`;
+    let size = fitted.get(key);
+    if (size === undefined) {
+      size = 1;
+      const overflows = () => el.scrollWidth > el.clientWidth + 1 || el.scrollHeight > el.clientHeight + 1;
+      while (size > 0.5 && overflows()) {
+        size = Math.round((size - 0.06) * 100) / 100;
+        el.style.fontSize = `${size}em`;
+      }
+      fitted.set(key, size);
+    }
+    if (size < 1) el.style.fontSize = `${size}em`;
+  });
+  return el;
 }
 
 /** What players did to the card over the games, drawn on top of its face. */
